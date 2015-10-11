@@ -1,0 +1,17 @@
+{
+  "name": "FEUP-CMOV_TrainTicketsServer",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/francisco-maciel/FEUP-CMOV_TrainTickets.git"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Francisco Maciel & Hugo Sousa",
+  "dependencies": {
+    "express": "~4.0.0",
+    "morgan": "~1.0.0",
+    "body-parser": "~1.0.1"
+  }
+}
