@@ -1,0 +1,97 @@
+-- MySQL dump 10.13  Distrib 5.6.24, for Win64 (x86_64)
+--
+-- Host: localhost    Database: trainsystem
+-- ------------------------------------------------------
+-- Server version	5.6.27-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Dumping data for table `credit_card`
+--
+
+LOCK TABLES `credit_card` WRITE;
+/*!40000 ALTER TABLE `credit_card` DISABLE KEYS */;
+INSERT INTO `credit_card` VALUES (1,'VISA','4493829384712361','2017-02-01');
+/*!40000 ALTER TABLE `credit_card` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `route`
+--
+
+LOCK TABLES `route` WRITE;
+/*!40000 ALTER TABLE `route` DISABLE KEYS */;
+INSERT INTO `route` VALUES (1,1,3,105,7,'\0',NULL,NULL,NULL);
+/*!40000 ALTER TABLE `route` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `station`
+--
+
+LOCK TABLES `station` WRITE;
+/*!40000 ALTER TABLE `station` DISABLE KEYS */;
+INSERT INTO `station` VALUES (1,'A'),(2,'A/Central'),(4,'B'),(5,'B/Central'),(6,'C'),(7,'C/Central'),(3,'Central');
+/*!40000 ALTER TABLE `station` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `station_stop`
+--
+
+LOCK TABLES `station_stop` WRITE;
+/*!40000 ALTER TABLE `station_stop` DISABLE KEYS */;
+INSERT INTO `station_stop` VALUES (1,1,1,'10:00:00',1,1),(2,2,1,'11:00:00',2,1),(3,3,1,'11:45:00',3,1);
+/*!40000 ALTER TABLE `station_stop` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `ticket`
+--
+
+LOCK TABLES `ticket` WRITE;
+/*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
+INSERT INTO `ticket` VALUES (1,1,1,'\0','0000-00-00 00:00:00'),(2,1,1,'','0000-00-00 00:00:00');
+/*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `train`
+--
+
+LOCK TABLES `train` WRITE;
+/*!40000 ALTER TABLE `train` DISABLE KEYS */;
+INSERT INTO `train` VALUES (1,100);
+/*!40000 ALTER TABLE `train` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'Hugo Sousa','hugo','hugo','529281723',1);
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2015-10-11 21:16:51
