@@ -1,0 +1,56 @@
+User
+-id
+-name
+-username
+-password
+-credit_card_id
+
+CreditCard
+-id
+-type
+-number
+-validity
+
+Station
+-id
+-name
+
+-Route (6*7 entradas nesta tabela - de todas para todas as estações)
+-id
+-start_station_id (Station)
+-end_station_id (Station)
+-distance
+-price
+-switch_central (boolean se tiver de trocar na estação central)
+-route_1 (se trocar na estação central)
+-route_2 (se trocar na estação central)
+
+StationStop (associar a ordem das estações de uma viagem. Por exemplo C->Central: C[1] -> C/Central[2] -> Central[3])
+-id
+-station_id
+-route_id
+-time
+-order
+
+Train
+-id
+-capacity
+
+Ticket
+-id
+-route_id
+-user_id
+-is_validated
+
+
+-------------------------------------------------------------------
+30mins -> 2€
+
+C -> C/C: 30 mins (2€)
+C/C -> Central: 30 mins (2€)
+A -> A/C: 60 mins (4€)
+A/C -> Central: 45 mins (3€)
+Central -> B/C: 60 mins (4€)
+B/C -> B: 45mins (3€) 
+
+
