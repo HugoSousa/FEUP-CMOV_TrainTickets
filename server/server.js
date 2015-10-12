@@ -17,86 +17,90 @@ app.use(bodyParser.json());
 var port     = process.env.PORT || 8080; // set our port
 
 var User     = require('./app/models/user');
+var database     = require('./app/modules/database')('dabase_url');
 
-// ROUTES FOR OUR API
+// GENERAL ROUTING
 // =============================================================================
 
-// create our router
 var router = express.Router();
 
-// middleware to use for all requests
 router.use(function(req, res, next) {
-	// do logging
-	console.log('Something is happening.');
+	console.log('Request arrived.');
 	next();
 });
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api)
+
 router.get('/', function(req, res) {
-	res.json({ message: 'hooray! welcome to our api!' });	
+	res.json({ result: {message:'Welcome to Train Tickets API!' } });	
 });
 
-// on routes that end in /bears
-// ----------------------------------------------------
-router.route('/bears')
+// USER ROUTING
+// =============================================================================
 
-	// create a bear (accessed at POST http://localhost:8080/bears)
+router.route('/register')
 	.post(function(req, res) {
-		
-		res.json({ message: 'Bear created!' });
-
+		// TODO check if req has data
+		res.json({ result: {message:'Sucess' } });
 	})
 
-	// get all the bears (accessed at GET http://localhost:8080/api/bears)
+router.route('/login')
+	.post(function(req, res) {
+		// TODO check if req has login data
+		// TODO preform auth and return ids
+		res.json({ result: {message:'Sucess' , token:'xyz'} });
+})
+
+router.route('/tickets')
 	.get(function(req, res) {
-		res.json({ message: 'Bear gotten!' });
+		// TODO check if req has login enabled
+		// TODO return tickets from auth user
+		res.json({ result: {message:'Sucess' , tickets:[]} });
+})
+	
+// TRAIN ROUTING
+// =============================================================================	
 
-	});
+router.route('/schedule')
+.get(function(req, res) {
+	// TODO check if req has station 1 and 2 data
+	res.json({ result: {message:'Sucess' , data:[]} });
+})
 
-	/*
-// on routes that end in /bears/:bear_id
-// ----------------------------------------------------
-router.route('/user/:bear_id')
 
-	// get the bear with that id
-	.get(function(req, res) {
-		Bear.findById(req.params.bear_id, function(err, bear) {
-			if (err)
-				res.send(err);
-			res.json(bear);
-		});
-	})
+//may not be needed, /schedule can send all the info?
 
-	// update the bear with this id
-	.put(function(req, res) {
-		Bear.findById(req.params.bear_id, function(err, bear) {
+router.route('/schedule/detail')
+.get(function(req, res) {
+	// TODO check if req has station 1 and 2 data
+	res.json({ result: {message:'Sucess' , data:[]} });
+})
 
-			if (err)
-				res.send(err);
+// OPERATIONAL ROUTING
+// =============================================================================	
 
-			bear.name = req.body.name;
-			bear.save(function(err) {
-				if (err)
-					res.send(err);
+router.route('/tickets/purchase')
+	.post(function(req, res) {
+		// TODO check if req has login enabled
+		// TODO check if trip data is present
+		res.json({ result: {message:'Sucess' , tickets:[]} });
+})
 
-				res.json({ message: 'Bear updated!' });
-			});
 
-		});
-	})
+router.route('/tickets/validate')
+	.post(function(req, res) {
+		// TODO check if req has login enabled
+		// TODO check if ticket data is present
+		res.json({ result: {message:'Sucess'} });
+})
 
-	// delete the bear with this id
-	.delete(function(req, res) {
-		Bear.remove({
-			_id: req.params.bear_id
-		}, function(err, bear) {
-			if (err)
-				res.send(err);
 
-			res.json({ message: 'Successfully deleted' });
-		});
-	});
-*/
+router.route('/tickets/listing')
+	.post(function(req, res) {
+		// TODO check if req has employee AUTH
+		// TODO check if req has trip detail (like the purchase?)
+		res.json({ result: {message:'Sucess'} });
+})
+
 
 // REGISTER OUR ROUTES -------------------------------
 app.use('/api', router);
@@ -104,4 +108,4 @@ app.use('/api', router);
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-console.log('Magic happens on port ' + port);
+console.log('Listening on port ' + port);
