@@ -48,7 +48,6 @@ CREATE TABLE `route` (
   `switch_central` bit(1) NOT NULL,
   `route_1` int(11) DEFAULT NULL,
   `route_2` int(11) DEFAULT NULL,
-  `arrival_central` time DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_route_route_1_idx` (`route_1`),
   KEY `fk_route_start_station_idx` (`start_station`),
@@ -58,7 +57,7 @@ CREATE TABLE `route` (
   CONSTRAINT `fk_route_route_1` FOREIGN KEY (`route_1`) REFERENCES `route` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_route_route_2` FOREIGN KEY (`route_2`) REFERENCES `route` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_route_start_station` FOREIGN KEY (`start_station`) REFERENCES `station` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +96,7 @@ CREATE TABLE `station_stop` (
   CONSTRAINT `fk_station_stop_route` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_station_stop_station` FOREIGN KEY (`station_id`) REFERENCES `station` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_station_stop_train` FOREIGN KEY (`train_id`) REFERENCES `train` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -132,7 +131,7 @@ CREATE TABLE `train` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `capacity` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,4 +164,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-11 21:12:33
+-- Dump completed on 2015-10-12 17:34:23
