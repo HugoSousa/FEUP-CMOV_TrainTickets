@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 var port     = process.env.PORT || 8080; // set our port
 
 var User     = require('./app/models/user');
-var database     = require('./app/modules/database')('dabase_url');
+var database     = require('./app/modules/database.js');
 
 // GENERAL ROUTING
 // =============================================================================
@@ -52,6 +52,7 @@ router.route('/login')
 
 router.route('/tickets')
 	.get(function(req, res) {
+		database.teste();
 		// TODO check if req has login enabled
 		// TODO return tickets from auth user
 		res.json({ result: {message:'Sucess' , tickets:[]} });

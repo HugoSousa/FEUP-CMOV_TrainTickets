@@ -1,27 +1,20 @@
 /** database.js **/
 
-module.exports = function (url) {
-    var database = {};
-	database.url = url;
-	
-	
-    database.auth = function (req, res) {
-        // This will be available 'outside'.
-        // Authy stuff that can be used outside...
-    };
+var mysql = require('mysql');
 
-    // Other stuff...
-    database.pickle = function(cucumber, herbs, vinegar) {
-        // This will be available 'outside'.
-        // Pickling stuff...
-    };
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  port     : 3306,
+  user     : 'root',
+  password : 'admin',
+  database : 'trainsystem'
+});
 
-    function jarThemPickles(pickle, jar) {
-        // This will be NOT available 'outside'.
-        // Pickling stuff...
-
-        return pickleJar;
-    };
-
-    return module;
-};
+exports.teste = function () {
+    connection.query('SELECT * from user', function(err, rows, fields) {
+      if (!err)
+        console.log('The solution is: ', rows);
+      else
+        console.log('Error while performing Query.');
+});
+}

@@ -10,8 +10,9 @@
   },
   "author": "Francisco Maciel & Hugo Sousa",
   "dependencies": {
+    "body-parser": "~1.0.1",
     "express": "~4.0.0",
     "morgan": "~1.0.0",
-    "body-parser": "~1.0.1"
+    "mysql": "^2.9.0"
   }
 }
