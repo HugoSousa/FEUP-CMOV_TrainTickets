@@ -52,9 +52,40 @@ router.route('/login')
 
 router.route('/tickets')
 	.get(function(req, res) {
-		database.teste();
+		//database.teste();
 		// TODO check if req has login enabled
 		// TODO return tickets from auth user
+		res.json({ result: {message:'Sucess' , tickets:[]} });
+})
+
+//returns the distance, price and starting times, given a starting and ending station
+router.route('/route')
+	.get(function(req,res) {
+		var from = req.query.from;
+		var to = req.query.to;
+		/*
+		database.teste(function(err, data){
+			if (err) {
+	            // error handling code goes here
+	            console.log("ERROR : ",err);            
+	        } else {            
+	            // code to execute on data retrieval
+	            console.log("result from db is : ",data);   
+	        }    
+		});*/
+
+		database.getTrainTimes(from, to, function(err, data){
+			if (err) {
+	            // error handling code goes here
+	            console.log("ERROR : ",err);            
+	        } else {            
+	            // code to execute on data retrieval
+	            console.log("result from db is : ",data);   
+	        }    
+		});
+		//console.log(result);
+		//console.log(cb)
+
 		res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 	
