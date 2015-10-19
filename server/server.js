@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var app        = express();
 var morgan     = require('morgan');
 
+var async = require('async');
+
 // configure app
 app.use(morgan('dev')); // log requests to the console
 
@@ -17,7 +19,7 @@ app.use(bodyParser.json());
 var port     = process.env.PORT || 8080; // set our port
 
 var User     = require('./app/models/user');
-var database     = require('./app/modules/database.js');
+var database = require('./app/modules/database.js');
 
 // GENERAL ROUTING
 // =============================================================================
@@ -50,12 +52,32 @@ router.route('/login')
 		res.json({ result: {message:'Sucess' , token:'xyz'} });
 })
 
+router.route('/teste')
+	.get(function(req, res) {
+
+		database.teste();
+		res.json({ result: {message:'Sucess' , tickets:[]} });
+})
+
+//return unused tickets of a user
 router.route('/tickets')
 	.get(function(req, res) {
 		//database.teste();
 		// TODO check if req has login enabled
 		// TODO return tickets from auth user
-		res.json({ result: {message:'Sucess' , tickets:[]} });
+		var user = req.query.user;
+
+		database.getUnusedTickets(user, function(err, data){
+			if (err) {
+	            // error handling code goes here
+	            console.log("ERROR : ",err);            
+	        } else {            
+	            // code to execute on data retrieval
+	            console.log("result from db is : ", data);
+	            res.json(data);   
+	        }    
+		});
+		//res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 
 //returns the distance, price and starting times, given a starting and ending station
@@ -80,13 +102,41 @@ router.route('/route')
 	            console.log("ERROR : ",err);            
 	        } else {            
 	            // code to execute on data retrieval
+	            res.status(200);
 	            console.log("result from db is : ",data);   
-	        }    
-		});
-		//console.log(result);
-		//console.log(cb)
+	            //res.json({ result: {message:'Sucess' , tickets:[]} });
+	            res.json(data);
+	            /*
+	            async.forEachOf(data.trips, function(value, key, callback){
+	            	database.checkTrainCapacity(from, to, value.times[0], value.train, key, function(data){
 
-		res.json({ result: {message:'Sucess' , tickets:[]} });
+						console.log("AAAAAA");
+	            		console.log(JSON.stringify(data));
+	            		//data.trips[key]['sold_out'] = data['result'];
+	            		
+	            	})
+	            	callback();
+            	},
+	            function(err){
+
+	            	res.json({ result: {message:'Sucess' , tickets:[]} });
+	            } 
+            	);
+				*/
+	            /*
+	            for(var i = 0; i < data.trips.length; i++){
+	              checkTrainCapacity(from, to, data.trips[i].times[0], data.trips[i].train, function(data){
+	                //result.trips[i]['sold_out'] = data;
+	                console.log("SAME SHIT");
+	              });    
+	              
+	              console.log("JA FOSTE");
+
+	            }*/
+
+	            
+	        }    
+		});		
 })
 	
 // TRAIN ROUTING

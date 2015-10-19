@@ -10,6 +10,7 @@
   },
   "author": "Francisco Maciel & Hugo Sousa",
   "dependencies": {
+    "async": "^1.4.2",
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
     "morgan": "~1.0.0",

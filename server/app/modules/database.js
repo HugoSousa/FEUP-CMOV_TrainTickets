@@ -1,6 +1,7 @@
 /** database.js **/
 
 var mysql = require('mysql');
+var async = require('async');
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -10,18 +11,212 @@ var connection = mysql.createConnection({
   database : 'trainsystem'
 });
 
-exports.teste = function (callback) {
-    connection.query('SELECT * from user', function(err, rows, fields) {
-      if (!err){
-        console.log('The solution is: ', rows);
-        callback(err, rows);
-      }
-      else
-        console.log('Error while performing Query.');
-  });
+
+//data for checking capacity exceeding
+var stations = [];
+stations[1] = "A";
+stations[2] = "A/CENTRAL";
+stations[3] = "CENTRAL";
+stations[4] = "B";
+stations[5] = "B/CENTRAL";
+stations[6] = "C";
+stations[7] = "C/CENTRAL";
+
+
+var route_affectances = [
+{
+  route:"A-A/CENTRAL",
+  affects: ["A-A/CENTRAL"]
+},
+{
+  route: "A-B",
+  affects: ["A-A/CENTRAL", "A/CENTRAL-CENTRAL", "CENTRAL-B/CENTRAL", "B/CENTRAL-B"]
+},
+{
+  route: "A-B/CENTRAL",
+  affects: ["A-A/CENTRAL", "A/CENTRAL-CENTRAL", "CENTRAL-B/CENTRAL"]
+},
+{
+  route: "A-CENTRAL",
+  affects: ["A-A/CENTRAL", "A/CENTRAL-CENTRAL"]
+},
+{
+  route: "A/CENTRAL-A",
+  affects: ["A/CENTRAL-A"]
+},
+{
+  route: "A/CENTRAL-B",
+  affects: ["A/CENTRAL-CENTRAL", "CENTRAL-B/CENTRAL", "B/CENTRAL-B"]
+},
+{
+  route: "A/CENTRAL-B/CENTRAL",
+  affects: ["A/CENTRAL-CENTRAL", "CENTRAL-B/CENTRAL"]
+},
+{
+  route: "A/CENTRAL-CENTRAL",
+  affects: ["A/CENTRAL-CENTRAL"]
+},
+{
+  route: "B-A",
+  affects: ["B-B/CENTRAL", "B/CENTRAL-CENTRAL", "CENTRAL-A/CENTRAL", "A/CENTRAL-A"]
+},
+{
+  route: "B-A/CENTRAL",
+  affects: ["B-B/CENTRAL", "B/CENTRAL-CENTRAL", "CENTRAL-A/CENTRAL"]
+},
+{
+  route: "B-B/CENTRAL",
+  affects: ["B-B/CENTRAL"]
+},
+{
+  route: "B-CENTRAL",
+  affects: ["B-B/CENTRAL", "B/CENTRAL-CENTRAL"]
+},
+{
+  route: "B/CENTRAL-A",
+  affects: ["B/CENTRAL-CENTRAL", "CENTRAL-A/CENTRAL", "A/CENTRAL-A"]
+},
+{
+  route: "B/CENTRAL-A/CENTRAL",
+  affects: ["B/CENTRAL-CENTRAL", "CENTRAL-A/CENTRAL"]
+},
+{
+  route: "B/CENTRAL-B",
+  affects: ["B/CENTRAL-B"]
+},
+{
+  route: "B/CENTRAL-CENTRAL",
+  affects: ["B/CENTRAL-CENTRAL"]
+},
+{
+  route: "C-C/CENTRAL",
+  affects: ["C-C/CENTRAL"]
+},
+{
+  route: "C-CENTRAL",
+  affects: ["C-C/CENTRAL", "C/CENTRAL-CENTRAL"]
+},
+{
+  route: "C/CENTRAL-C",
+  affects: ["C/CENTRAL-C"]
+},
+{
+  route: "C/CENTRAL-CENTRAL",
+  affects: ["C/CENTRAL-CENTRAL"]
+},
+{
+  route: "CENTRAL-A",
+  affects: ["CENTRAL-A/CENTRAL", "A/CENTRAL-A"]
+},
+{
+  route: "CENTRAL-A/CENTRAL",
+  affects: ["CENTRAL-A/CENTRAL"]
+},
+{
+  route: "CENTRAL-B",
+  affects: ["CENTRAL-B/CENTRAL", "B/CENTRAL-B"]
+},
+{
+  route: "CENTRAL-B/CENTRAL",
+  affects: ["CENTRAL-B/CENTRAL"]
+},
+{
+  route: "CENTRAL-C",
+  affects: ["CENTRAL-C/CENTRAL", "C/CENTRAL-C"]
+},
+{
+  route: "CENTRAL-C/CENTRAL",
+  affects: ["CENTRAL-C/CENTRAL"]
+}];
+
+/*-------------------------------------------------------------------------------------*/
+
+exports.teste = function () {
+  //checkTrainCapacity(1,4,null,2);
 }
 
+
+exports.getTrainTimesTest = function (from, to, cb){
+
+  var result = { trips: [], distance: null, price: null, switch_central: null};
+
+  async.series([
+    function(callback) {
+      console.log("ONE");
+      connection.query('select * from route r where r.start_station = ? and r.end_station = ?;', [from, to], function (err, rows, fields) {
+        if (!err) {
+
+          var switch_central = rows[0]['switch_central'][0];
+          if(switch_central == 0){
+
+            //var result = { trips: [], distance: rows[0]['distance'], price: rows[0]['price'], switch_central: false };
+            result.distance = rows[0]['distance'];
+            result.price = rows[0]['price'];
+            result.switch_central = false;
+
+
+            connection.query('select * from route r join station_stop ss on ss.route_id = r.id where r.start_station = ? and r.end_station = ? order by ss.time;', [from, to], function (err1, rows1, fields1) {
+              
+              if(!err1){
+
+                for(var i = 0; i < rows1.length; i++) {
+
+                  var row = rows1[i];
+
+                  if(row['order'] == 1){
+                    result.trips.push( { stations: [], times: [], train: row['train_id'] } );
+                  }
+                  
+                  result.trips[result.trips.length - 1].stations.push(row['station_id']);
+                  result.trips[result.trips.length - 1].times.push(row['time']);
+                }
+
+                console.log("OI");
+                callback(null, result);
+              }
+
+              else{
+                callback(err1, null);
+              }
+              
+              console.log(JSON.stringify(result));
+            });       
+          }
+        }
+        else{
+          callback(err, null);
+        }
+      });
+    },
+    function(callback) {
+      //check sold_out for each trip
+      console.log("TWO");
+      var callFunctions = [];
+      for(var i = 0; i < result.trips.length; i++){
+        /*
+        checkTrainCapacity(from, to, result.trips[i].times[0], result.trips[i].train, i, function(data){
+          console.log("CHANGE SOLD_OUT TRIP FOR INDEX " + data['index'] + " WITH " + data['result']);
+          result.trips[data['index']]['sold_out'] = data['result'];
+
+        });   
+        */
+        
+      }
+      callback(null, callFunctions);
+    }],
+    function(err, results){
+
+      console.log("THREE")
+      cb(null, result);
+    }
+  );
+}
+
+
 exports.getTrainTimes = function (from, to, cb) {
+
+  //TODO: check if the capacity is exceeded for each trip (return 'sold_out' boolean field)
+
   connection.query('select * from route r where r.start_station = ? and r.end_station = ?;', [from, to], function (err, rows, fields) {
     if (!err) {
 
@@ -39,11 +234,21 @@ exports.getTrainTimes = function (from, to, cb) {
               var row = rows1[i];
 
               if(row['order'] == 1){
-                result.trips.push( { stations: [], times: [] } );
+                result.trips.push( { stations: [], times: [], train: row['train_id'] } );
               }
               
               result.trips[result.trips.length - 1].stations.push(row['station_id']);
               result.trips[result.trips.length - 1].times.push(row['time']);
+            }
+
+            //check sold_out for each trip
+            for(var i = 0; i < result.trips.length; i++){
+              /*
+              checkTrainCapacity(from, to, result.trips[i].times[0], result.trips[i].train, i, function(data){
+                //result.trips[i]['sold_out'] = data;
+              });    
+              */
+
             }
 
             cb(null, result);
@@ -53,11 +258,11 @@ exports.getTrainTimes = function (from, to, cb) {
             cb(err1, null);
           }
           
-          //console.log(JSON.stringify(result));
-        });        
+          console.log(JSON.stringify(result));
+        });       
       }
       else{
-
+        
         central_station_times = [];
         var route_1 = rows[0]['route_1'];
         var route_2 = rows[0]['route_2'];
@@ -130,6 +335,8 @@ exports.getTrainTimes = function (from, to, cb) {
             }
             
             console.log(JSON.stringify(result));
+
+            //check sold_out for each trip
             cb(null, result);
           }
           else{
@@ -140,6 +347,7 @@ exports.getTrainTimes = function (from, to, cb) {
       }
     }
     
+    
     else{
       console.log('Error while performing Query.');
       cb(err,null);
@@ -147,6 +355,26 @@ exports.getTrainTimes = function (from, to, cb) {
   });
 
 }
+
+
+exports.getUnusedTickets = function (user, cb) {
+
+  //TODO: instead of user parameter, get user from the authentication
+
+  connection.query('select * from ticket where user_id = ? and is_validated = (0);', [user], function (err, rows, fields) {
+    if (!err){
+        cb(null, rows);
+      }
+      else{
+        console.log('Error while performing Query.');
+        cb(err,null);
+      }
+  });
+
+
+}
+
+
 
 //returns the index of central_station_times where there is the less waiting time
 getLessWaitingTime = function (central_station_times, last_time) {
@@ -164,4 +392,104 @@ getLessWaitingTime = function (central_station_times, last_time) {
   }
 
   return index;
+}
+
+exports.checkTrainCapacity = function(from, to, datetime, train_id, index, cb){
+
+  var capacity;
+
+  connection.query('select * from train where id = ?', [train_id], function (err, rows, fields) {
+      if(!err){
+        capacity = rows[0].capacity;
+        console.log(rows[0].capacity);
+        console.log("CAPACITY: ", capacity);
+
+        //get the affected routes from routes_affectance. 
+        //for each affected route, get the other routes with that affected route
+        //get the sold tickets for those routes and check if the sum exceeds the train capacity
+        //set the sold_out parameter in result
+        var affects = [];
+
+        for(var i = 0; i < route_affectances.length; i++){
+          if(route_affectances[i].route == (stations[from] + "-" + stations[to])){
+            var affected_routes = route_affectances[i].affects;
+
+            for(var j = 0; j < affected_routes.length; j++){
+
+              var affected_ticket_routes = [];
+
+              for(var k = 0; k < route_affectances.length; k++){
+
+                if(route_affectances[k].affects.indexOf(affected_routes[j]) != -1){
+                  affected_ticket_routes.push({route_name: route_affectances[k].route});
+
+                }
+              }
+
+              if(affected_ticket_routes.length > 0){
+
+                for(var l = 0; l < affected_ticket_routes.length; l++){
+
+                  var route_split = affected_ticket_routes[l].route_name.split("-");
+                  var from_station_name = route_split[0];
+                  var to_station_name = route_split[1];
+
+                  affected_ticket_routes[l]["from"] = stations.indexOf(from_station_name);
+                  affected_ticket_routes[l]["to"] = stations.indexOf(to_station_name);
+                }
+
+                affects.push({ route: affected_routes[j], affected: affected_ticket_routes });
+              }
+            }
+
+            break;
+          }
+        }
+
+        console.log("AFFECTS: " + JSON.stringify(affects));
+
+        for(var i = 0; i < affects.length; i++){
+
+          //TODO: change user
+          //TODO change date
+          var sql_query = "select count(*) as occupied from ticket t join route r join station_stop ss on t.route_id = r.id and ss.route_id = r.id and ss.time = time(t.route_date) where user_id = 1 and is_validated = (0) and date(t.route_date) = '2015-10-18' and time(t.route_date) = ss.time"; 
+          
+          for( var j = 0; j < affects[i].affected.length; j++){
+            
+            if(j != 0)
+              sql_query += " or";
+            else
+              sql_query += " and (";
+
+            sql_query += " (r.start_station = " + affects[i].affected[j].from + " and r.end_station = " + affects[i].affected[j].to + " )";
+          }
+
+          sql_query += " )";
+
+          //console.log("QUERY: " + sql_query);
+          
+          connection.query(sql_query, function (err, rows, fields) {
+            if(!err){
+              console.log("CAPACITY: " + capacity);
+              console.log("OCCUPIED: " + rows[0].occupied);
+              if(parseInt(rows[0].occupied) >= parseInt(capacity)){
+                console.log("RETURNED TRUE");
+                cb({index: index, result: true});
+              }
+              else{
+                cb({index: index, result: false});
+              }
+            }
+            else{
+              console.log("Error in query: ", err);
+            }
+          });
+
+        }
+
+      }
+      else{
+        console.log("Error in query: ", err);
+      }
+    });
 }
