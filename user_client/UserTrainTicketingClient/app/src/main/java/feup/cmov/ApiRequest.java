@@ -31,10 +31,10 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject result)
     {
-        System.out.println(result);
+        //System.out.println(result);
         //create new activity with list of routes
         Intent listRoutesIntent = new Intent(context, RoutesListActivity.class);
-        //myIntent.putExtra("key", value); //Optional parameters
+        listRoutesIntent.putExtra("routes", result.toString()); //Optional parameters
         listRoutesIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(listRoutesIntent);
         System.out.println("Open list of routes");

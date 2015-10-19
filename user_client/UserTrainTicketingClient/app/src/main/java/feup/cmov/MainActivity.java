@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         if(isNetworkConnected()){
             ApiRequest request = new ApiRequest(getApplicationContext());
-            request.execute("ahh");
+            request.execute("teste");
             System.out.println("After request");
         }
         else{
