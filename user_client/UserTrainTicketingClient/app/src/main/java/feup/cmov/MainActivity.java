@@ -2,6 +2,7 @@ package feup.cmov;
 
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -104,7 +105,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_login) {
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            startActivity(loginIntent);
+            return true;
+        }else if(id == R.id.action_register){
+            Intent loginIntent = new Intent(this, RegisterActivity.class);
+            startActivity(loginIntent);
             return true;
         }
 
@@ -128,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         if(isNetworkConnected()){
             ApiRequest request = new ApiRequest(getApplicationContext());
-            request.execute("teste"); //TODO check for connection timeout and send a warning to the user
+            request.execute("teste");
             System.out.println("After request");
         }
         else{
@@ -144,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         return (cm.getActiveNetworkInfo() != null);
     }
+
 }
 
 

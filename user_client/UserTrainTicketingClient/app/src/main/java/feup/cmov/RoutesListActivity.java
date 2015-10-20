@@ -56,7 +56,7 @@ public class RoutesListActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        
+
         ExpandableListView routesList = (ExpandableListView) findViewById(R.id.routes_listview);
         ExpandableListViewAdapter adapter = new ExpandableListViewAdapter(getApplicationContext(), routes);
         routesList.setAdapter(adapter);
