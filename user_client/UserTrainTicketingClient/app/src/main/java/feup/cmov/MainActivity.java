@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         if(isNetworkConnected()){
             ApiRequest request = new ApiRequest(getApplicationContext());
-            request.execute("teste");
+            request.execute("teste"); //TODO check for connection timeout and send a warning to the user
             System.out.println("After request");
         }
         else{

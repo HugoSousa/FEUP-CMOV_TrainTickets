@@ -3,7 +3,10 @@ package feup.cmov;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.SimpleExpandableListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +38,7 @@ public class RoutesListActivity extends AppCompatActivity {
 
                 if (stationsJSON != null) {
                     for (int j=0;j < stationsJSON.length(); j++){
-                        stations.add((Integer)stationsJSON.get(i));
+                        stations.add((Integer)stationsJSON.get(j));
                     }
                 }
                 if (timesJSON != null) {
@@ -53,12 +56,10 @@ public class RoutesListActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        //TODO change to ExpandableListView to see more details of the trip...? stations and time on each station
-        ListView routesList = (ListView) findViewById(R.id.routes_listview);
-        ArrayAdapter<Route> adapter = new ArrayAdapter<Route>(this, android.R.layout.simple_list_item_1, routes);
+        
+        ExpandableListView routesList = (ExpandableListView) findViewById(R.id.routes_listview);
+        ExpandableListViewAdapter adapter = new ExpandableListViewAdapter(getApplicationContext(), routes);
         routesList.setAdapter(adapter);
-        //routesList.setOnItemClickListener(this);
 
     }
 }
