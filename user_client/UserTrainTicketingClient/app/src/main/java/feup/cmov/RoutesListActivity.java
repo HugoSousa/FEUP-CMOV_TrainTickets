@@ -2,7 +2,9 @@ package feup.cmov;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
@@ -23,7 +25,7 @@ public class RoutesListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_routes_list);
 
         Bundle extras = getIntent().getExtras();
-        String routesString = (String)extras.get("routes");
+        String routesString = (String)extras.get("data");
         ArrayList<Route> routes = new ArrayList<Route>();
         try {
             JSONObject routesJSON = new JSONObject(routesString);

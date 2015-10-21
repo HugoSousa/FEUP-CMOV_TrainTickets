@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -90,6 +91,16 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
             resultView = inflater.inflate(R.layout.expandable_list_group, null); //TODO change layout id
             holder = new ViewHolder();
             holder.textLabel = (TextView) resultView.findViewById(R.id.row_name); //TODO change view id
+            Button buyButton = (Button) resultView.findViewById(R.id.buy_button);
+            buyButton.setFocusable(false);
+
+            buyButton.setOnClickListener(new Button.OnClickListener() {
+                public void onClick(View v) {
+                    //button functionalty   ...
+                    System.out.println("clicked buy button");
+                }
+            });
+
             resultView.setTag(holder);
         } else {
             holder = (ViewHolder) resultView.getTag();
