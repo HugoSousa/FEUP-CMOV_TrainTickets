@@ -3,6 +3,7 @@ package feup.cmov;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        invalidateOptionsMenu();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -91,9 +93,34 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        //update the options menu when activity is restored from login activity
+        invalidateOptionsMenu();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        SharedPreferences sp = this.getSharedPreferences("login", 0);
+
+        String token = sp.getString("token", null);
+        if(token == null){
+            //user not logged in
+            menu.findItem(R.id.action_tickets).setVisible(false);
+            menu.findItem(R.id.action_logout).setVisible(false);
+        }
+        else{
+            //user logged in
+            menu.findItem(R.id.action_register).setVisible(false);
+            menu.findItem(R.id.action_login).setVisible(false);
+        }
+        //TODO if user is logged in: hide "Login"/"Register", show "Tickets"
+        //TODO if user is not logged in: hide "Tickets", show "Login"/"Register"
+
         return true;
     }
 
@@ -113,6 +140,15 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             Intent loginIntent = new Intent(this, RegisterActivity.class);
             startActivity(loginIntent);
             return true;
+        }else if(id == R.id.action_logout){
+            SharedPreferences sp = this.getSharedPreferences("login", 0);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString("token", null);
+            editor.commit();
+            invalidateOptionsMenu();
+        }else if(id == R.id.action_tickets){
+            ApiRequest request = new ApiRequest(getApplicationContext(), TicketsActivity.class);
+            request.execute("teste");
         }
 
         return super.onOptionsItemSelected(item);
@@ -134,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
     public void searchRoutes(View v){
 
         if(isNetworkConnected()){
-            ApiRequest request = new ApiRequest(getApplicationContext());
+            ApiRequest request = new ApiRequest(getApplicationContext(), RoutesListActivity.class);
             request.execute("teste");
             System.out.println("After request");
         }

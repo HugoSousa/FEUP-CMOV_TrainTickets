@@ -15,5 +15,7 @@
     <string name="label_cc_type">Credit Card Type</string>
     <string name="label_cc_number">Credit Card Number</string>
     <string name="label_cc_validity">Credit Card Validity</string>
-
+    <string name="buy">Buy</string>
+    <string name="tickets">Tickets</string>
+    <string name="logout">Logout</string>
 </resources>
