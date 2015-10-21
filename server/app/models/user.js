@@ -2,9 +2,14 @@
 
 var User = function (data) {  
     this.data = data;
+    console.log(this.data);
 }
 
 User.prototype.data = {}
+
+User.prototype.isValid = function () {  
+	return false;
+}
 
 User.prototype.changeName = function (name) {  
     this.data.name = name;

@@ -41,8 +41,9 @@ router.get('/', function(req, res) {
 
 router.route('/register')
 	.post(function(req, res) {
-		// TODO check if req has data
-		res.json({ result: {message:'Sucess' } });
+		var new_user = new User(req.body);
+		if (!new_user.isValid()) res.json({ result: {message:'Invalid' } });
+		else res.json({ result: {message:'Sucess' } });
 	})
 
 router.route('/login')
