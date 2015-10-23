@@ -1,11 +1,14 @@
 package feup.cmov;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,8 +24,10 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     private final ArrayList<Route> itemList;
     private final LayoutInflater inflater;
+    private Context context;
 
     public ExpandableListViewAdapter(Context context, ArrayList<Route> itemList) {
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.itemList = itemList;
     }
@@ -94,12 +99,48 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
             Button buyButton = (Button) resultView.findViewById(R.id.buy_button);
             buyButton.setFocusable(false);
 
+
             buyButton.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
-                    //button functionalty   ...
-                    System.out.println("clicked buy button");
+
+                    //if not logged in, make user login first and redirect to the purchase activity
+                    //else redirect to the purchase activity
+                    SharedPreferences spToken = context.getSharedPreferences("login", 0);
+
+                    String token = spToken.getString("token", null);
+                    if(token == null){
+                        //user not logged in
+                        Intent loginActivity = new Intent(context, LoginActivity.class);
+                        loginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        View parentRow = (View) v.getParent();
+                        ExpandableListView listView = (ExpandableListView) parentRow.getParent();
+                        final int position = listView.getPositionForView(parentRow);
+                        Route r = (Route)listView.getItemAtPosition(position);
+
+                        //add shared preference with the ticket to be redirected after the login (verify after successful login)
+                        SharedPreferences spRoute = context.getSharedPreferences("route", 0);
+                        SharedPreferences.Editor editor = spRoute.edit();
+                        editor.putString("route", "true");
+                        editor.putString("route_from", r.stationTimes.get(0).station.toString());
+                        editor.putString("route_to", r.stationTimes.get(r.stationTimes.size() - 1).station.toString());
+                        editor.putString("route_time", r.stationTimes.get(0).time);
+                        editor.putString("route_date", r.stationTimes.get(0).time);
+                        editor.commit();
+
+                        context.startActivity(loginActivity);
+                    }
+                    else{
+                        //user logged in
+                        //Intent purchaseActivity = new Intent(context, TicketPurchaseActivity.class);
+                        //purchaseActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class);
+                        request.execute("teste");
+                        //context.startActivity(purchaseActivity);
+                    }
                 }
             });
+
 
             resultView.setTag(holder);
         } else {
@@ -112,6 +153,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
 
         return resultView;
     }
+
 
     @Override
     public boolean hasStableIds() {

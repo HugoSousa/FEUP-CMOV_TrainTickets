@@ -32,6 +32,8 @@
         </activity>
         <activity android:name=".TicketActivity" >
         </activity>
+        <activity android:name=".TicketPurchaseActivity" >
+        </activity>
     </application>
 
 </manifest>

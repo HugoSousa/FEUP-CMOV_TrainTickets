@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("CLICKED");
                 stationsToList.clear();
                 //remove the same element from the list
                 for(int i = 0; i < stationsCopy.size(); i++){
@@ -118,8 +117,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             menu.findItem(R.id.action_register).setVisible(false);
             menu.findItem(R.id.action_login).setVisible(false);
         }
-        //TODO if user is logged in: hide "Login"/"Register", show "Tickets"
-        //TODO if user is not logged in: hide "Tickets", show "Login"/"Register"
 
         return true;
     }

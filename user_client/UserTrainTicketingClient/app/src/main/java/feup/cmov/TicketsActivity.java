@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -47,5 +48,8 @@ public class TicketsActivity extends AppCompatActivity {
                 //Toast.makeText(SuggestionActivity.this, "" + position, Toast.LENGTH_SHORT).show();
             }
         });
+
     }
+
+
 }

@@ -49,11 +49,12 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
         //create new activity with list of routes
         if(result != null) {
             if(redirect != null) {
+                System.out.println("ON POST EXECUTE");
                 Intent intent = new Intent(context, redirect);
-                intent.putExtra("data", result.toString()); //Optional parameters
+                intent.putExtra("data", result.toString());
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
-                //System.out.println("Open list of routes");
+
             }
         }else{
             Toast.makeText(context, "Can't retrieve your search. Please check if you you're connected to Internet.", Toast.LENGTH_LONG).show();
