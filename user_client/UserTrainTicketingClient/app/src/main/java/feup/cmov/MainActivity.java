@@ -16,9 +16,21 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements DatePickerFragment.ListenerActivity{
+
+    private ArrayList<Station> stationsFromList;
+    private ArrayList<Station> stationsToList;
+    private ArrayList<Station> stationsCopy;
+
+    private ArrayAdapter<Station> adapter_from;
+    private ArrayAdapter<Station> adapter_to;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +40,33 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //TODO get from db instead of hardcoded
-        final ArrayList<Station> stationsFromList = new ArrayList<Station>();
+        stationsFromList = new ArrayList<Station>();
+
+        ApiRequest request = new ApiRequest(this, null, null);
+        try {
+            JSONObject result = request.execute("stations").get();
+            JSONArray stations = (JSONArray)result.get("stations");
+
+            SharedPreferences sp = this.getSharedPreferences("stations", 0);
+            SharedPreferences.Editor editor = sp.edit();
+
+            for(int i = 0; i < stations.length(); i++){
+                JSONObject station = (JSONObject)stations.get(i);
+                stationsFromList.add(new Station((String) station.get("name"), (int) station.get("id")));
+                editor.putString(station.get("id").toString(), (String) station.get("name"));
+            }
+
+            editor.commit();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        /*
+
+        System.out.println("STATIONS: " + stationsFromList);
 
         stationsFromList.add(new Station("A", 1));
         stationsFromList.add(new Station("A/CENTRAL", 2));
@@ -38,20 +75,23 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         stationsFromList.add(new Station("B/CENTRAL", 5));
         stationsFromList.add(new Station("C", 6));
         stationsFromList.add(new Station("C/CENTRAL", 7));
+        */
 
-        final ArrayList<Station> stationsToList = new ArrayList<Station>(stationsFromList);
-        final ArrayList<Station> stationsCopy = new ArrayList<Station>(stationsToList);
+        stationsToList = new ArrayList<Station>(stationsFromList);
+        stationsCopy = new ArrayList<Station>(stationsToList);
 
         Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
-        ArrayAdapter<Station> adapter_from = new ArrayAdapter<Station>(this, android.R.layout.simple_spinner_item, stationsFromList); // initialize the adapter
-        adapter_from.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter_from = new ArrayAdapter<Station>(this, R.layout.spinner_centered_textview, stationsFromList); // initialize the adapter
+        adapter_from.setDropDownViewResource(R.layout.spinner_centered_textview);
         spinner_from.setAdapter(adapter_from);
 
-        Spinner spinner_to = (Spinner) findViewById(R.id.spinner_to);
-        ArrayAdapter<Station> adapter_to = new ArrayAdapter<Station>(this, android.R.layout.simple_spinner_item, stationsToList); // initialize the adapter
-        adapter_to.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final Spinner spinner_to = (Spinner) findViewById(R.id.spinner_to);
+        adapter_to = new ArrayAdapter<Station>(this, R.layout.spinner_centered_textview, stationsToList); // initialize the adapter
+        adapter_to.setDropDownViewResource(R.layout.spinner_centered_textview);
         spinner_to.setAdapter(adapter_to);
-        spinner_to.setSelection(1);
+
+        spinner_to.setSelection(1, true);
+        stationsFromList.remove(1);
 
         spinner_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -61,9 +101,13 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
                 //remove the same element from the list
                 for(int i = 0; i < stationsCopy.size(); i++){
                     if(! stationsCopy.get(i).name.equals(stationsFromList.get(position).name)){
+                        //System.out.println("ADDED " + stationsCopy.get(i));
                         stationsToList.add(stationsCopy.get(i));
                     }
                 }
+
+                //adapter_from.notifyDataSetChanged();
+                //adapter_to.notifyDataSetChanged();
             }
 
             @Override
@@ -75,13 +119,17 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("SPINNER TO CLICKED");
+
                 stationsFromList.clear();
                 //remove the same element from the list
-                for(int i = 0; i < stationsCopy.size(); i++){
-                    if(! stationsCopy.get(i).name.equals(stationsToList.get(position).name)){
+                for (int i = 0; i < stationsCopy.size(); i++) {
+                    if (!stationsCopy.get(i).name.equals(stationsToList.get(position).name)) {
                         stationsFromList.add(stationsCopy.get(i));
                     }
                 }
+                //adapter_from.notifyDataSetChanged();
+                //adapter_to.notifyDataSetChanged();
             }
 
             @Override
@@ -89,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
             }
         });
+
     }
 
     @Override
@@ -144,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             editor.commit();
             invalidateOptionsMenu();
         }else if(id == R.id.action_tickets){
-            ApiRequest request = new ApiRequest(getApplicationContext(), TicketsActivity.class);
+            ApiRequest request = new ApiRequest(getApplicationContext(), TicketsActivity.class, null);
             request.execute("teste");
         }
 
@@ -167,16 +216,34 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
     public void searchRoutes(View v){
 
         if(isNetworkConnected()){
-            ApiRequest request = new ApiRequest(getApplicationContext(), RoutesListActivity.class);
-            request.execute("teste");
-            System.out.println("After request");
+
+            String date = ((TextView)findViewById(R.id.date_text)).getText().toString();
+
+            if(date.equals(getString(R.string.label_date))){
+                ((TextView)findViewById(R.id.text_warning_search)).setText("Please insert a date.");
+                return;
+            }else{
+                ((TextView)findViewById(R.id.text_warning_search)).setText("");
+            }
+
+
+            Bundle bundle = new Bundle();
+            bundle.putString("date", date);
+
+            ApiRequest request = new ApiRequest(getApplicationContext(), RoutesListActivity.class, bundle);
+            //get id from and to
+            Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
+            int fromPosition = spinner_from.getSelectedItemPosition();
+            int fromId = stationsFromList.get(fromPosition).id;
+            Spinner spinner_to = (Spinner) findViewById(R.id.spinner_to);
+            int toPosition = spinner_to.getSelectedItemPosition();
+            int toId = stationsToList.get(toPosition).id;
+
+            request.execute("routes?from=" + fromId + "&to=" + toId + "&date=" + date);
         }
-        else{
+        else {
             System.out.println("No internet connection");
         }
-        System.out.println("search");
-
-        //request to /api/routes?from=X&to=Y
     }
 
     private boolean isNetworkConnected() {
@@ -184,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         return (cm.getActiveNetworkInfo() != null);
     }
-
 }
 
 

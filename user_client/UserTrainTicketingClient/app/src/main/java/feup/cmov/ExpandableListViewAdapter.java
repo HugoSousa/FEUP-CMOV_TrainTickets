@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 /**
@@ -108,15 +110,20 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
                     SharedPreferences spToken = context.getSharedPreferences("login", 0);
 
                     String token = spToken.getString("token", null);
+
+                    View parentRow = (View) v.getParent();
+                    ExpandableListView listView = (ExpandableListView) parentRow.getParent();
+                    final int position = listView.getPositionForView(parentRow);
+                    View rootView = (View) listView.getParent();
+                    TextView dateView = (TextView)rootView.findViewById(R.id.route_date);
+                    String date = dateView.getText().toString();
+
+                    Route r = (Route)listView.getItemAtPosition(position);
+
                     if(token == null){
                         //user not logged in
                         Intent loginActivity = new Intent(context, LoginActivity.class);
                         loginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                        View parentRow = (View) v.getParent();
-                        ExpandableListView listView = (ExpandableListView) parentRow.getParent();
-                        final int position = listView.getPositionForView(parentRow);
-                        Route r = (Route)listView.getItemAtPosition(position);
 
                         //add shared preference with the ticket to be redirected after the login (verify after successful login)
                         SharedPreferences spRoute = context.getSharedPreferences("route", 0);
@@ -125,18 +132,16 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
                         editor.putString("route_from", r.stationTimes.get(0).station.toString());
                         editor.putString("route_to", r.stationTimes.get(r.stationTimes.size() - 1).station.toString());
                         editor.putString("route_time", r.stationTimes.get(0).time);
-                        editor.putString("route_date", r.stationTimes.get(0).time);
+                        editor.putString("route_date", date);
                         editor.commit();
 
                         context.startActivity(loginActivity);
                     }
                     else{
                         //user logged in
-                        //Intent purchaseActivity = new Intent(context, TicketPurchaseActivity.class);
-                        //purchaseActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class);
-                        request.execute("teste");
-                        //context.startActivity(purchaseActivity);
+
+                        ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class, null);
+                        request.execute("route?from=" + r.stationTimes.get(0).station + "&to=" + r.stationTimes.get(r.stationTimes.size() - 1).station + "&time=" + r.stationTimes.get(0).time + "&date=" + date);
                     }
                 }
             });

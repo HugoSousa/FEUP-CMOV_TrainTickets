@@ -493,3 +493,140 @@ exports.checkTrainCapacity = function(from, to, datetime, train_id, index, cb){
       }
     });
 }
+
+
+exports.getStations = function (cb) {
+
+  connection.query('select * from station', function (err, rows, fields) {
+    if (!err){
+        cb(null, rows);
+      }
+      else{
+        console.log('Error while performing Query.');
+        cb(err,null);
+      }
+  });
+}
+
+exports.getRoute = function (from, to, time, date, cb) {
+
+  //se switch_central = 1, tem de buscar de from -> 3 + 3 -> to
+  connection.query('select * from route r where r.start_station = ? and r.end_station = ?', [from, to], function (err0, rows0, fields0) {
+    if(!err0){
+
+      if(rows0[0]['switch_central'][0] == 0)
+      {
+        connection.query('select ss.id, ss.station_id, ss.time, ss.order, ss.train_id from route r join station_stop ss on ss.route_id = r.id where r.start_station = ? and r.end_station = ? and ss.time >= ?', [from, to, time], function (err, rows, fields) {
+      
+        if (!err){
+
+          var max_order = 1;
+          var start = 0; //for cases when the first returned rows don't start in order 1
+
+          for(var i = 0; i < rows.length; i++){
+            if(rows[i].order > 1)
+              start = i+1;
+            else
+              break;
+          }
+
+          for(var i = 0; i < rows.length; i++){
+            if(rows[i].order > max_order)
+              max_order = rows[i].order;
+          }
+
+          //limit to the first max_order rows
+          var result = [];
+          for(var i = start; i-start < max_order; i++){
+            result.push(rows[i]);
+          }
+
+          cb(null, {ticket_1: result, ticket_2: null, price: rows0[0]['price'], distance: rows0[0]['distance'], from: from, to: to, time: time, date: date});
+        }
+
+        else{
+          console.log('Error while performing Query 1.');
+          cb(err,null);
+        }
+
+        });
+      }else{
+        //necessario retornar bilhete de from->3 e 3->to
+
+          var result = {ticket_1: null, ticket_2: null, price: rows0[0]['price'], distance: rows0[0]['distance'], from: from, to: to, time: time, date: date};
+
+          connection.query('select ss.id, ss.station_id, ss.time, ss.order, ss.train_id from route r join station_stop ss on ss.route_id = r.id where r.start_station = ? and r.end_station = 3 and ss.time >= ? ', [from, time], function (err1, rows1, fields1) {
+          
+            if (!err1){
+              var max_order = 1;
+              var start = 0; //for cases when the first returned rows don't start in order 1
+
+              for(var i = 0; i < rows1.length; i++){
+                if(rows1[i].order > 1)
+                  start = i+1;
+                else
+                  break;
+              }
+
+              for(var i = 0; i < rows1.length; i++){
+                if(rows1[i].order > max_order)
+                  max_order = rows1[i].order;
+              }
+
+              //limit to the first max_order rows
+              var ticket_1 = [];
+              for(var i = start; i-start < max_order; i++){
+                ticket_1.push(rows1[i]);
+              }
+
+              result.ticket_1 = ticket_1;
+
+              console.log("AQUI!" + ticket_1[ticket_1.length - 1].time);
+
+              connection.query('select ss.id, ss.station_id, ss.time, ss.order, ss.train_id from route r join station_stop ss on ss.route_id = r.id where r.start_station = 3 and r.end_station = ? and ss.time >= ?', [to, ticket_1[ticket_1.length - 1].time], function (err2, rows2, fields2) {
+                if(!err2){
+                  var max_order = 1;
+                  var start = 0; //for cases when the first returned rows don't start in order 1
+
+                  for(var i = 0; i < rows2.length; i++){
+                    if(rows2[i].order > 1)
+                      start = i+1;
+                    else
+                      break;
+                  }
+
+                  for(var i = 0; i < rows2.length; i++){
+                    if(rows2[i].order > max_order)
+                      max_order = rows2[i].order;
+                  }
+
+                  //limit to the first max_order rows
+                  var ticket_2 = [];
+
+                  for(var i = start; i-start < max_order; i++){
+                    ticket_2.push(rows2[i]);
+                  }
+
+                  result.ticket_2 = ticket_2;
+
+                  cb(null, result);
+                }
+                else{
+                  console.log('Error while performing Query 2.', err2);
+                  cb(err2,null);
+                }
+              });
+            }
+            else{
+              console.log('Error while performing Query 3.');
+              cb(err1,null);
+            }
+          });
+      }
+    }
+    else{
+      console.log('Error while performing Query 4.');
+      cb(err0,null);
+    }
+  });
+}

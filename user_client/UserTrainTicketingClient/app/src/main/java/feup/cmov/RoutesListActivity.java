@@ -9,6 +9,7 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +27,10 @@ public class RoutesListActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         String routesString = (String)extras.get("data");
+        String date = (String)extras.getBundle("other").get("date");
+
+        ((TextView)findViewById(R.id.route_date)).setText(date);
+
         ArrayList<Route> routes = new ArrayList<Route>();
         try {
             JSONObject routesJSON = new JSONObject(routesString);

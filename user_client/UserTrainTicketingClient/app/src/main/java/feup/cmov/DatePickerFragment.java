@@ -22,8 +22,6 @@ public class DatePickerFragment extends DialogFragment
         public void updateDate(String date);
     }
 
-
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker

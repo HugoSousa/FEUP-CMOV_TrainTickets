@@ -20,5 +20,7 @@
     <string name="logout">Logout</string>
     <string name="label_route_distance">Distance</string>
     <string name="label_route_price">Price</string>
-    <string name="label_route_waiting_time">Waiting Time (Central Station)</string>
+    <string name="label_route_waiting_time">Waiting Time</string>
+    <string name="label_station">Station</string>
+    <string name="label_time">Time</string>
 </resources>

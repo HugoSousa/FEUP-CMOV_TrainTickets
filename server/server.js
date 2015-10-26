@@ -60,6 +60,20 @@ router.route('/teste')
 		res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 
+router.route('/stations')
+	.get(function(req, res) {
+		// TODO check if req has login enabled
+		// TODO return stations from auth user
+		database.getStations(function(err, data){
+			if (err) {
+	            console.log("ERROR : ",err);            
+	        } else {            
+	            res.json({stations: data});   
+	        }  
+		});
+		//res.json({ result: {message:'Sucess' , tickets:[]} });
+})
+
 //return unused tickets of a user
 router.route('/tickets')
 	.get(function(req, res) {
@@ -81,11 +95,31 @@ router.route('/tickets')
 		//res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 
-//returns the distance, price and starting times, given a starting and ending station
 router.route('/route')
+	.get(function(req, res) {
+		// TODO check if req has login enabled
+		// TODO return tickets from auth user
+		var from = req.query.from;
+		var to = req.query.to;
+		var time = req.query.time;
+		var date = req.query.date;
+
+		database.getRoute(from, to, time, date, function(err, data){
+			if (err) {
+	            console.log("ERROR : ",err);            
+	        } else {            
+	            res.json(data);   
+	        }    
+		});
+		//res.json({ result: {message:'Sucess' , tickets:[]} });
+})
+
+//returns the distance, price and starting times, given a starting and ending station
+router.route('/routes')
 	.get(function(req,res) {
 		var from = req.query.from;
 		var to = req.query.to;
+		var date = req.query.date; //needed to check if tickets are sold_out
 		/*
 		database.teste(function(err, data){
 			if (err) {

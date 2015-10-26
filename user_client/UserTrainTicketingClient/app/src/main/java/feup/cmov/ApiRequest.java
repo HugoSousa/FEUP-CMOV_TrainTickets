@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -22,10 +23,13 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
     private Context context;
     private Class redirect;
+    private Bundle data;
+    private final String API_URL = "http://192.168.1.65:8080/api/";
 
-    ApiRequest(Context context, Class redirect){
+    ApiRequest(Context context, Class redirect, Bundle data){
         this.context = context;
         this.redirect = redirect;
+        this.data = data;
     }
 
     @Override
@@ -33,7 +37,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
         try{
             //JSONObject result = requestWebService("http://172.30.9.206:8080/api/route?from=1&to=4");
-            JSONObject result = requestWebService("http://192.168.1.65:8080/api/route?from=1&to=4");
+            JSONObject result = requestWebService(API_URL + params[0]);
             return result;
         }catch(SocketTimeoutException e){
             System.out.println("Connection timed out. Show a warning to the user.");
@@ -52,6 +56,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
                 System.out.println("ON POST EXECUTE");
                 Intent intent = new Intent(context, redirect);
                 intent.putExtra("data", result.toString());
+                intent.putExtra("other", data);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
 

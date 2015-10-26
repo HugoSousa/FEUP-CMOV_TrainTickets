@@ -14,43 +14,42 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/linearLayout">
+        android:id="@+id/linearLayout"
+        android:gravity="center">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/label_from"/>
+            android:text="@string/label_from"
+            android:gravity="center"/>
 
         <Spinner
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:id="@+id/spinner_from"
-            android:layout_weight="1" />
+            android:gravity="center"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/label_to"/>
+            android:text="@string/label_to"
+            android:gravity="center"/>
 
         <Spinner
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:id="@+id/spinner_to"
             android:layout_weight="1" />
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/date_text"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/label_date"/>
+                android:text="@string/label_date"
+                android:gravity="center"/>
 
             <Button
                 android:layout_width="wrap_content"
@@ -58,13 +57,18 @@
                 android:text="@string/pick_date"
                 android:onClick="showDatePickerDialog" />
 
-        </LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:id="@+id/text_warning_search"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/search"
-            android:onClick="searchRoutes" />
+            android:onClick="searchRoutes"
+            android:layout_marginTop="@dimen/activity_vertical_margin"/>
 
 
     </LinearLayout>
