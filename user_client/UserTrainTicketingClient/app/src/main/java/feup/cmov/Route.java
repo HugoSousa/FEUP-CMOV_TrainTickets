@@ -11,7 +11,7 @@ public class Route {
     public ArrayList<StationTime> stationTimes = new ArrayList<StationTime>();
     public int train1;
     public int train2;
-    public int waitingTime;
+    public int waitingTime = -1;
 
     public Route(ArrayList<Integer> stations, ArrayList<String> times, int train){
         //this.stations = stations;

@@ -42,8 +42,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         stationsFromList = new ArrayList<Station>();
 
-        ApiRequest request = new ApiRequest(this, null, null);
+        ApiRequest request = new ApiRequest(this, null, null, ApiRequest.GET);
         try {
+            //TODO if no internet or server down, application crashes right away
             JSONObject result = request.execute("stations").get();
             JSONArray stations = (JSONArray)result.get("stations");
 
@@ -90,8 +91,9 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         adapter_to.setDropDownViewResource(R.layout.spinner_centered_textview);
         spinner_to.setAdapter(adapter_to);
 
-        spinner_to.setSelection(1, true);
         stationsFromList.remove(1);
+        adapter_to.notifyDataSetChanged();
+        adapter_from.notifyDataSetChanged();
 
         spinner_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
@@ -193,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             editor.commit();
             invalidateOptionsMenu();
         }else if(id == R.id.action_tickets){
-            ApiRequest request = new ApiRequest(getApplicationContext(), TicketsActivity.class, null);
+            ApiRequest request = new ApiRequest(getApplicationContext(), TicketsActivity.class, null, ApiRequest.GET);
             request.execute("teste");
         }
 
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             Bundle bundle = new Bundle();
             bundle.putString("date", date);
 
-            ApiRequest request = new ApiRequest(getApplicationContext(), RoutesListActivity.class, bundle);
+            ApiRequest request = new ApiRequest(getApplicationContext(), RoutesListActivity.class, bundle, ApiRequest.GET);
             //get id from and to
             Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
             int fromPosition = spinner_from.getSelectedItemPosition();

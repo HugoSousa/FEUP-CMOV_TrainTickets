@@ -28,7 +28,8 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/register_name_input"/>
+            android:id="@+id/register_name_input"
+            android:gravity="center"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -39,7 +40,9 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/register_id_input"/>
+            android:id="@+id/register_id_input"
+            android:gravity="center"
+            android:maxLength="22"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -51,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/spinner_cc_type"
-            android:layout_weight="1" />
+            android:entries="@array/credit_card_types"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -62,7 +65,11 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/register_cc_number"/>
+            android:id="@+id/register_cc_number"
+            android:gravity="center"
+            android:digits="01234 56789"
+            android:inputType="number"
+            android:maxLength="19"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -74,7 +81,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:focusableInTouchMode="false"
-            android:id="@+id/register_cc_validity"/>
+            android:id="@+id/register_cc_validity"
+            android:gravity="center"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -85,19 +93,22 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/register_username"/>
+            android:id="@+id/register_username"
+            android:gravity="center"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/label_password"/>
+            android:text="@string/label_password"
+            android:gravity="center"/>
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/register_password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:gravity="center"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -109,12 +120,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/register_confirm_password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:gravity="center"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/register"/>
+            android:text="@string/register"
+            android:gravity="center"
+            android:onClick="register"/>
 
     </LinearLayout>
 </RelativeLayout>

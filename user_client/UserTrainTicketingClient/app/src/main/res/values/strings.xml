@@ -23,4 +23,13 @@
     <string name="label_route_waiting_time">Waiting Time</string>
     <string name="label_station">Station</string>
     <string name="label_time">Time</string>
+
+    <string-array name="credit_card_types">
+        <item>VISA</item>
+        <item>VISAELECTRON</item>
+        <item>MASTERCARD</item>
+        <item>AE</item>
+        <item>JCB</item>
+        <item>OTHER</item>
+    </string-array>
 </resources>

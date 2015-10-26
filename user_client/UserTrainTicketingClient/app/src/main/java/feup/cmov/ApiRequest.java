@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
@@ -21,15 +22,19 @@ import java.util.Scanner;
  */
 public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
+    public static int GET = 1;
+    public static int POST = 2;
+    private int requestType;
     private Context context;
     private Class redirect;
     private Bundle data;
     private final String API_URL = "http://192.168.1.65:8080/api/";
 
-    ApiRequest(Context context, Class redirect, Bundle data){
+    ApiRequest(Context context, Class redirect, Bundle data, int requestType){
         this.context = context;
         this.redirect = redirect;
         this.data = data;
+        this.requestType = requestType;
     }
 
     @Override
@@ -37,7 +42,11 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
         try{
             //JSONObject result = requestWebService("http://172.30.9.206:8080/api/route?from=1&to=4");
-            JSONObject result = requestWebService(API_URL + params[0]);
+            JSONObject result = null;
+            if(requestType == GET)
+                result = requestWebService(API_URL + params[0], GET, null);
+            else if(requestType == POST)
+                result = requestWebService(API_URL + params[0], POST, params[1]);
             return result;
         }catch(SocketTimeoutException e){
             System.out.println("Connection timed out. Show a warning to the user.");
@@ -56,7 +65,8 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
                 System.out.println("ON POST EXECUTE");
                 Intent intent = new Intent(context, redirect);
                 intent.putExtra("data", result.toString());
-                intent.putExtra("other", data);
+                if(data != null)
+                    intent.putExtra("other", data);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
 
@@ -66,7 +76,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
         }
     }
 
-    public static JSONObject requestWebService(String serviceUrl) throws SocketTimeoutException {
+    public static JSONObject requestWebService(String serviceUrl, int requestType, String query) throws SocketTimeoutException {
         //disableConnectionReuseIfNecessary();
 
         HttpURLConnection urlConnection = null;
@@ -74,9 +84,20 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
             // create connection
             URL urlToRequest = new URL(serviceUrl);
             urlConnection = (HttpURLConnection)urlToRequest.openConnection();
-
             urlConnection.setConnectTimeout(5000);
             //urlConnection.setReadTimeout(DATARETRIEVAL_TIMEOUT);
+
+            if(requestType == ApiRequest.POST) {
+                urlConnection.setDoOutput(true); // Triggers POST.
+                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                try {
+                    OutputStream output = urlConnection.getOutputStream();
+                    output.write(query.getBytes("UTF-8"));
+                }catch (Exception e){
+                    System.out.println("Error: " + e);
+                    throw e;
+                }
+            }
 
             // handle issues
             int statusCode = urlConnection.getResponseCode();

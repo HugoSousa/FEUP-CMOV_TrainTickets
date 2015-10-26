@@ -1,5 +1,6 @@
 package feup.cmov;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,10 +10,13 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -69,7 +73,21 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
 
         final StationTime item = getChild(groupPosition, childPosition);
 
-        holder.textLabel.setText(item.toString());
+        if(childPosition > 1){
+            if(getStationName(getChild(groupPosition, childPosition - 1).station.toString()).toUpperCase().equals("CENTRAL") && getGroup(groupPosition).waitingTime != -1){
+                int minutes = getGroup(groupPosition).waitingTime;
+                int hours = minutes / 60;
+                minutes = minutes % 60;
+                DecimalFormat df = new DecimalFormat("00");
+
+                holder.textLabel.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
+            }else{
+                holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
+            }
+        }
+        else {
+            holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
+        }
 
         return resultView;
     }
@@ -92,15 +110,17 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View theConvertView, ViewGroup parent) {
         View resultView = theConvertView;
-        ViewHolder holder;
+        ViewHolder holder1;
+        ViewHolder holder2;
 
         if (resultView == null) {
             resultView = inflater.inflate(R.layout.expandable_list_group, null); //TODO change layout id
-            holder = new ViewHolder();
-            holder.textLabel = (TextView) resultView.findViewById(R.id.row_name); //TODO change view id
+            holder1 = new ViewHolder();
+            holder1.textLabel = (TextView) resultView.findViewById(R.id.label_route_from_to); //TODO change view id
+            holder2 = new ViewHolder();
+            holder2.textLabel = (TextView) resultView.findViewById(R.id.label_route_times); //TODO change view id
             Button buyButton = (Button) resultView.findViewById(R.id.buy_button);
             buyButton.setFocusable(false);
-
 
             buyButton.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
@@ -115,12 +135,12 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
                     ExpandableListView listView = (ExpandableListView) parentRow.getParent();
                     final int position = listView.getPositionForView(parentRow);
                     View rootView = (View) listView.getParent();
-                    TextView dateView = (TextView)rootView.findViewById(R.id.route_date);
+                    TextView dateView = (TextView) rootView.findViewById(R.id.text_route_date);
                     String date = dateView.getText().toString();
 
-                    Route r = (Route)listView.getItemAtPosition(position);
+                    Route r = (Route) listView.getItemAtPosition(position);
 
-                    if(token == null){
+                    if (token == null) {
                         //user not logged in
                         Intent loginActivity = new Intent(context, LoginActivity.class);
                         loginActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -136,25 +156,40 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
                         editor.commit();
 
                         context.startActivity(loginActivity);
-                    }
-                    else{
+                    } else {
                         //user logged in
 
-                        ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class, null);
+                        ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class, null, ApiRequest.GET);
                         request.execute("route?from=" + r.stationTimes.get(0).station + "&to=" + r.stationTimes.get(r.stationTimes.size() - 1).station + "&time=" + r.stationTimes.get(0).time + "&date=" + date);
                     }
                 }
             });
 
 
-            resultView.setTag(holder);
+            resultView.setTag(holder1);
+            resultView.setTag(holder2);
         } else {
-            holder = (ViewHolder) resultView.getTag();
+            holder1 = (ViewHolder) resultView.getTag();
+            holder2 = (ViewHolder) resultView.getTag();
         }
 
         final Route item = getGroup(groupPosition);
 
-        holder.textLabel.setText(item.toString());
+        //holder.textLabel.setText(item.toString());
+        //holder1.textLabel.setText("FROM " + getStationName(item.stationTimes.get(0).station.toString()) + " TO " + getStationName(item.stationTimes.get(item.stationTimes.size() - 1).station.toString()));
+        holder1.textLabel.setText("[ " + item.stationTimes.get(0).time + " - " + item.stationTimes.get(item.stationTimes.size() - 1).time + " ]");
+        if(item.waitingTime != -1) {
+            int minutes = item.waitingTime;
+            int hours = minutes / 60;
+            minutes = minutes % 60;
+            DecimalFormat df = new DecimalFormat("00");
+
+            holder2.textLabel.setText("Waiting Time: " + df.format(hours) + ":" + df.format(minutes));
+        }
+        else{
+            holder1.textLabel.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            holder2.textLabel.setVisibility(View.GONE);
+        }
 
         return resultView;
     }
@@ -167,7 +202,13 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return true;
+        return false;
     }
 
+    private String getStationName(String id){
+
+        SharedPreferences sp = context.getSharedPreferences("stations", 0);
+
+        return sp.getString(id, null);
+    }
 }
