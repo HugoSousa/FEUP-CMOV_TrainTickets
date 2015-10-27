@@ -696,9 +696,10 @@ exports.getUserByUsername = function (username, cb) {
 
 exports.buyTickets = function (user, from, to, date, time, cb){
 
-  var datetime = date + " " + time;
-  //validate the credit card of the user, using the fake external service!
+  //TODO validate the credit card of the user, using the fake external service!
 
+  var datetime = date + " " + time;
+ 
   this.getRoute(from, to, time, date, function(err, data){
     if(!err){
       if(data['sold_out'] == false){
@@ -710,8 +711,8 @@ exports.buyTickets = function (user, from, to, date, time, cb){
 
           connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, datetime], function (err1, result1) {
             if (!err1){
-                
-                cb(null, {message: "Successfully inserted ticket " + result1.insertedId });
+                console.log(JSON.stringify(result1));
+                cb(null, {message: "Successfully inserted ticket " + result1.insertId });
             }
             else{
               console.log('Error while performing Query 1.', err1);
@@ -726,27 +727,30 @@ exports.buyTickets = function (user, from, to, date, time, cb){
 
           //buy 2 tickets in transaction
           connection.beginTransaction(function(err){
-            if(err){ throw err; }
+            if(err){ cb({error: "Trnsaction error"}, null); }
 
-            connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, 0, datetime], function(err1, results1){
-              if(!err1){
+            connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, datetime], function(err1, result1){
+              if(err1){
                 connection.rollback(function() {
                   cb(err1, null);
                 });
               }else{
-                connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_2, user, 0, datetime],function(err2, results2){
-                  if(!err2){
+                var time2 = data['ticket_2'][0]['time'];
+                var datetime2 = date + " " + time2;
+
+                connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_2, user, datetime2],function(err2, result2){
+                  if(err2){
                     connection.rollback(function() {
                       cb(err2, null);
                     });
                   }else{
                     connection.commit(function(err_commit){
-                      if(err_comit){
+                      if(err_commit){
                         connection.rollback(function() {
                           cb(err_commit, null);
                         });
                       }else{
-                        cb(null, {message: "Sucessfully inserted tickets " + result1.insertedId + " and " + result2.insertedId});
+                        cb(null, {message: "Sucessfully inserted tickets " + result1.insertId + " and " + result2.insertId});
                       }
                     })
                     
