@@ -678,7 +678,7 @@ connection.beginTransaction(function(err) {
 exports.getUserByUsername = function (username, cb) {
 //TODO add credit card supp
 //TODO remove id number
-  connection.query('select * from user where username = ?',[username], function (err, rows, fields) {
+  connection.query('select * from user,credit_card where username = ? and credit_card.id = user.cc_id',[username], function (err, rows, fields) {
     if (!err){
         console.log(rows[0]);
         cb(null, rows[0]);

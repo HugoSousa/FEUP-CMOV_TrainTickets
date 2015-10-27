@@ -50,9 +50,9 @@ router.route('/register')
 		var new_user = new User(req.body);
 		if (new_user.validate()) {
 			database.registeruser(new_user, function (err, result) {
-				console.log(err);
+
 				if (err || result == null) res.status(400).json({
-					 result: {message: 'Duplicate username'},
+					 result: {message: 'Duplicate username or creditcard id'},
 					 error: err 
 				})
 				else
