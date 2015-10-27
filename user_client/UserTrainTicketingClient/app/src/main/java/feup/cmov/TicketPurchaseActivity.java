@@ -24,6 +24,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class TicketPurchaseActivity extends AppCompatActivity {
+    private String from = null;
+    private String to = null;
+    private String date = null;
+    private String time = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +44,6 @@ public class TicketPurchaseActivity extends AppCompatActivity {
         ArrayList<Integer> stations = new ArrayList<Integer>();
         ArrayList<String> times = new ArrayList<String>();
         int price = -1, distance = -1;
-        String from = null, to = null, date = null;
         Route route = null;
         int ticket1Size = 0, ticket2Size = 0;
         int train1 = -1, train2 = -1;
@@ -99,6 +102,7 @@ public class TicketPurchaseActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        time = times.get(0);
 
         ((TextView)findViewById(R.id.text_route_from_to)).setText("FROM " + getStationName(from) + " TO " + getStationName(to));
         ((TextView)findViewById(R.id.text_route_date)).setText(date);
@@ -202,6 +206,24 @@ public class TicketPurchaseActivity extends AppCompatActivity {
         //do only 1 request to server, even if it's 2 separate tickets
     }
 
+    public void buyTickets(View view){
+
+        SharedPreferences sp = this.getSharedPreferences("stations", 0);
+        ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.POST);
+        JSONObject data = new JSONObject();
+        try {
+            data.put("to", to);
+            data.put("from", from);
+            data.put("date", date);
+            data.put("time", time);
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        request.execute("tickets/purchase",data.toString());
+    }
     private String getStationName(String id){
 
         SharedPreferences sp = this.getSharedPreferences("stations", 0);

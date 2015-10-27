@@ -90,7 +90,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
             if(requestType == ApiRequest.POST) {
                 urlConnection.setDoOutput(true); // Triggers POST.
-                urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
                 try {
                     OutputStream output = urlConnection.getOutputStream();
                     output.write(query.getBytes("UTF-8"));
