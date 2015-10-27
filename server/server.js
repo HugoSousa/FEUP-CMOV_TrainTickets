@@ -224,9 +224,26 @@ router.route('/schedule/detail')
 
 router.route('/tickets/purchase')
 	.post(function(req, res) {
+		var user_id = 1;
 		// TODO check if req has login enabled
 		// TODO check if trip data is present
-		res.json({ result: {message:'Sucess' , tickets:[]} });
+		var from = req.body.from;
+		var to = req.body.to;
+		var date = req.body.date;
+		var time = req.body.time;
+		
+		//if multiple tickets, do transaction
+		database.buyTickets(user_id, from, to, date, time, function(err, data){
+			if(err){
+				res.status(400);
+				res.json({error: err});
+			}else{
+				res.json(data);
+			}
+		});
+
+
+		
 })
 
 

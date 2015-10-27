@@ -542,7 +542,9 @@ exports.getRoute = function (from, to, time, date, cb) {
             result.push(rows[i]);
           }
 
-          cb(null, {ticket_1: result, ticket_2: null, price: rows0[0]['price'], distance: rows0[0]['distance'], from: from, to: to, time: time, date: date});
+          var route = rows0[0]['id'];
+
+          cb(null, {ticket_1: result, ticket_2: null, route_1: route, route_2: null, price: rows0[0]['price'], distance: rows0[0]['distance'], from: from, to: to, time: time, date: date, sold_out: false});
         }
 
         else{
@@ -553,8 +555,9 @@ exports.getRoute = function (from, to, time, date, cb) {
         });
       }else{
         //necessario retornar bilhete de from->3 e 3->to
-
-          var result = {ticket_1: null, ticket_2: null, price: rows0[0]['price'], distance: rows0[0]['distance'], from: from, to: to, time: time, date: date};
+          var route1 = rows0[0]['route_1'];
+          var route2 = rows0[0]['route_2'];
+          var result = {ticket_1: null, ticket_2: null, route_1: route1, route_2: route2, price: rows0[0]['price'], distance: rows0[0]['distance'], from: from, to: to, time: time, date: date, sold_out: false};
 
           connection.query('select ss.id, ss.station_id, ss.time, ss.order, ss.train_id from route r join station_stop ss on ss.route_id = r.id where r.start_station = ? and r.end_station = 3 and ss.time >= ? ', [from, time], function (err1, rows1, fields1) {
           
@@ -689,4 +692,78 @@ exports.getUserByUsername = function (username, cb) {
         cb(err,null);
       }
   });
+}
+
+exports.buyTickets = function (user, from, to, date, time, cb){
+
+  var datetime = date + " " + time;
+  //validate the credit card of the user, using the fake external service!
+
+  this.getRoute(from, to, time, date, function(err, data){
+    if(!err){
+      if(data['sold_out'] == false){
+        if(data['ticket_2'] == null){
+          
+          //buy only ticket_1
+
+          var route_1 = data['route_1'];
+
+          connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, datetime], function (err1, result1) {
+            if (!err1){
+                
+                cb(null, {message: "Successfully inserted ticket " + result1.insertedId });
+            }
+            else{
+              console.log('Error while performing Query 1.', err1);
+              cb(err1,null);
+            }
+          });
+
+        }else{
+          
+          var route_1 = data['route_1'];
+          var route_2 = data['route_2'];
+
+          //buy 2 tickets in transaction
+          connection.beginTransaction(function(err){
+            if(err){ throw err; }
+
+            connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, 0, datetime], function(err1, results1){
+              if(!err1){
+                connection.rollback(function() {
+                  cb(err1, null);
+                });
+              }else{
+                connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_2, user, 0, datetime],function(err2, results2){
+                  if(!err2){
+                    connection.rollback(function() {
+                      cb(err2, null);
+                    });
+                  }else{
+                    connection.commit(function(err_commit){
+                      if(err_comit){
+                        connection.rollback(function() {
+                          cb(err_commit, null);
+                        });
+                      }else{
+                        cb(null, {message: "Sucessfully inserted tickets " + result1.insertedId + " and " + result2.insertedId});
+                      }
+                    })
+                    
+                  }
+                })
+              }
+            })
+          })
+        }
+      }
+      else{
+        cb({error: "Ticket sold out!"}, null);
+      }
+    }
+    else{
+      cb(err,null);
+    }
+  })
+
 }
