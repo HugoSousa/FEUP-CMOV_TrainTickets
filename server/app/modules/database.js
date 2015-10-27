@@ -2,6 +2,7 @@
 
 var mysql = require('mysql');
 var async = require('async');
+var moment = require('moment');
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -640,7 +641,7 @@ connection.beginTransaction(function(err) {
   if (err) cb(err,null);
   else {
     connection.query('insert into credit_card(type,number,validity) values(?,?,?)', 
-      [user.creditcard_type, user.creditcard_number, user.creditcard_validity], function(err, result) {
+      [user.creditcard_type, user.creditcard_number, moment(new Date(user.creditcard_validity)).format("YYYY-MM-DD HH:mm:ss")], function(err, result) {
         if (err) {
          connection.rollback(function() {
           cb(err,null);
