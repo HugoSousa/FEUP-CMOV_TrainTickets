@@ -262,6 +262,12 @@ router.route('/tickets/listing')
 		res.json({ result: {message:'Sucess'} });
 })
 
+router.route('/ping')
+.get(function(req, res) {
+	res.status(200).json();
+	//res.json({ result: {message:'Sucess'} });
+})
+
 
 // REGISTER OUR ROUTES -------------------------------
 app.use('/api', router);

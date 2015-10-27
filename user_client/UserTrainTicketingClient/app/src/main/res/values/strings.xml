@@ -17,13 +17,15 @@
     <string name="label_cc_validity">Credit Card Validity</string>
     <string name="buy">Buy</string>
     <string name="tickets">Tickets</string>
+    <string name="unused_tickets">Unused Tickets</string>
     <string name="logout">Logout</string>
     <string name="label_route_distance">Distance</string>
     <string name="label_route_price">Price</string>
     <string name="label_route_waiting_time">Waiting Time</string>
     <string name="label_station">Station</string>
     <string name="label_time">Time</string>
-
+    <string name="text_offline_logged_in">You\'re in offline mode.\n\nYou can check your unused tickets.\n\nGo online for full functionality of the app. </string>
+    <string name="text_offline_not_logged_in">You\'re in offline mode and you aren\'t logged in.\n\nGo online for full functionality of the app. </string>
     <string-array name="credit_card_types">
         <item>VISA</item>
         <item>VISAELECTRON</item>

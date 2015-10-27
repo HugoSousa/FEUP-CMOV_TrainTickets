@@ -21,6 +21,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
         </activity>
         <activity android:name=".RoutesListActivity" >
         </activity>
@@ -33,6 +36,8 @@
         <activity android:name=".TicketActivity" >
         </activity>
         <activity android:name=".TicketPurchaseActivity" >
+        </activity>
+        <activity android:name=".InitialActivity" >
         </activity>
     </application>
 

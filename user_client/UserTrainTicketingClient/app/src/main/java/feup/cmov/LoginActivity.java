@@ -26,9 +26,9 @@ public class LoginActivity extends AppCompatActivity {
         finish();
 
         SharedPreferences spRoute = this.getSharedPreferences("route", 0);
-        String token = spRoute.getString("route", null);
+        String route = spRoute.getString("route", null);
 
-        if(token != null){
+        if(route != null){
 
             //values to be used to retrieve the route info
             String routeFrom = spRoute.getString("route_from", null);
@@ -40,6 +40,14 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             ApiRequest request = new ApiRequest(this.getApplicationContext(), TicketPurchaseActivity.class, null, ApiRequest.GET); //will redirect to purchase of ticket with info of the route
             request.execute("route?from=" + routeFrom + "&to=" + routeTo + "&time=" + routeTime + "&date=" + routeDate);
+
+            SharedPreferences.Editor editorRoute = spRoute.edit();
+            editorRoute.putString("route", null);
+            editorRoute.putString("route_from", null);
+            editorRoute.putString("route_to", null);
+            editorRoute.putString("route_time", null);
+            editorRoute.putString("route_date", null);
+            editorRoute.commit();
         }
     }
 }

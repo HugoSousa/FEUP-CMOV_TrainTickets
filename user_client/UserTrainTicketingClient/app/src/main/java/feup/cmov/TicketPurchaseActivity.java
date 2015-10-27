@@ -218,11 +218,11 @@ public class TicketPurchaseActivity extends AppCompatActivity {
             data.put("time", time);
 
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         request.execute("tickets/purchase",data.toString());
+
     }
     private String getStationName(String id){
 
