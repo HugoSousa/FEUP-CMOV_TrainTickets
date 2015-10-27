@@ -83,7 +83,7 @@ app.get("/api/testlogin", [jwtauth], function (req, res) {
 router.route('/teste')
 	.get(function(req, res) {
 
-		database.teste();
+		//database.teste();
 		res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 

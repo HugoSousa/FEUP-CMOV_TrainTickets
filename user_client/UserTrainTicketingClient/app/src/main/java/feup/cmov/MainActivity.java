@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             editor.commit();
             invalidateOptionsMenu();
         }else if(id == R.id.action_tickets){
-            ApiRequest request = new ApiRequest(getApplicationContext(), TicketsActivity.class, null, ApiRequest.GET);
+            ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.GET);
             request.execute("teste");
         }
 

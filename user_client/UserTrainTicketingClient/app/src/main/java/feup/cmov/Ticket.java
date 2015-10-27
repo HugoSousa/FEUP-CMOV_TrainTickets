@@ -19,6 +19,6 @@ public class Ticket {
     }
 
     public String toString(){
-        return fromStation + "->" + toStation + ": " + date;
+        return fromStation + " - " + toStation + "\n" + date;
     }
 }
