@@ -6,6 +6,7 @@ var express    = require('express');
 var bodyParser = require('body-parser');
 var app        = express();
 var morgan     = require('morgan');
+var jwtauth = require('./app/modules/jwtAuth.js');
 
 var async = require('async');
 
@@ -20,6 +21,10 @@ var port     = process.env.PORT || 8080; // set our port
 
 var User     = require('./app/models/user');
 var database = require('./app/modules/database.js');
+
+//to change secret also change in jwtAuth
+app.set('jwtTokenSecret', 'hastodosecrettosecrettootell');
+
 
 // GENERAL ROUTING
 // =============================================================================
@@ -41,20 +46,34 @@ router.get('/', function(req, res) {
 
 router.route('/register')
 	.post(function(req, res) {
-		/*
-		var new_user = new User(req.body);
-		if (!new_user.isValid()) res.json({ result: {message:'Invalid' } });
 		
-		else */
-		res.json({ result: {message:'Sucess' } });
+		var new_user = new User(req.body);
+		if (new_user.validate()) {
+			database.registeruser(new_user, function (err, result) {
+
+				res.json({ result: {message: 'Sucess'}, error: err })
+			})
+		}
+		else {
+			res.json({ result: {message:'Invalid user' } });
+		}
+		
 	})
 
 router.route('/login')
 	.post(function(req, res) {
-		// TODO check if req has login data
-		// TODO preform auth and return ids
-		res.json({ result: {message:'Sucess' , token:'xyz'} });
+		if (req.body.username != undefined && req.body.username != "" && req.body.password != undefined && req.body.password != "") {
+			User.login(req.body.username, req.body.password, res, req.app);
+		} else {
+			res.status(400).json({
+				error: "Invalid request"
+			});
+		}
 })
+
+app.get("/api/testlogin", [jwtauth], function (req, res) {
+	res.send(req.user);
+});
 
 router.route('/teste')
 	.get(function(req, res) {
