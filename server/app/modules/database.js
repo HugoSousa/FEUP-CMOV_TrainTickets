@@ -630,3 +630,34 @@ exports.getRoute = function (from, to, time, date, cb) {
     }
   });
 }
+
+
+exports.registeruser = function (user, cb) {
+//TODO add credit card supp
+//TODO remove id number
+  connection.query('insert into user(name, username, password, cc_id) values (?,?,?,1)',[user.name, user.username, user.password], function (err, rows, fields) {
+    if (!err){
+        console.log(rows);
+        cb(null, rows);
+      }
+      else{
+        console.log('Error while performing Query.', err);
+        cb(err,null);
+      }
+  });
+}
+
+exports.getUserByUsername = function (username, cb) {
+//TODO add credit card supp
+//TODO remove id number
+  connection.query('select * from user where username = ?',[username], function (err, rows, fields) {
+    if (!err){
+        console.log(rows[0]);
+        cb(null, rows[0]);
+      }
+      else{
+        console.log('Error while performing Query.', err);
+        cb(err,null);
+      }
+  });
+}
