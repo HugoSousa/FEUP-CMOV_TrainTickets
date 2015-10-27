@@ -1,0 +1,17 @@
+{
+  "name": "fake_external_debt_service",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/francisco-maciel/FEUP-CMOV_TrainTickets.git"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Francisco Maciel & Hugo Sousa",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "morgan": "^1.6.1"
+  }
+}

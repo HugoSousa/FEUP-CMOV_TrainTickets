@@ -28,7 +28,8 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
     private Context context;
     private Class redirect;
     private Bundle data;
-    private final String API_URL = "http://192.168.1.65:8080/api/";
+    //private final String API_URL = "http://192.168.1.65:8080/api/";
+    private final String API_URL = "http://172.30.9.206:8080/api/";
 
     ApiRequest(Context context, Class redirect, Bundle data, int requestType){
         this.context = context;

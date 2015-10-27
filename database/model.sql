@@ -111,7 +111,7 @@ CREATE TABLE `ticket` (
   `route_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `is_validated` bit(1) NOT NULL,
-  `date` datetime NOT NULL,
+  `route_date` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_ticket_route_idx` (`route_id`),
   KEY `fk_ticket_user_idx` (`user_id`),
@@ -146,10 +146,8 @@ CREATE TABLE `user` (
   `name` varchar(45) NOT NULL,
   `username` varchar(30) NOT NULL,
   `password` varchar(256) NOT NULL,
-  `id_number` varchar(10) NOT NULL,
   `cc_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `identification_UNIQUE` (`id_number`),
   KEY `fk_user_credit_card_idx` (`cc_id`),
   CONSTRAINT `fk_user_credit_card` FOREIGN KEY (`cc_id`) REFERENCES `credit_card` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
@@ -164,4 +162,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-12 17:34:23
+-- Dump completed on 2015-10-27 14:04:25
