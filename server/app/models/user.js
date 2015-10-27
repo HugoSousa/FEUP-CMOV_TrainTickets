@@ -25,7 +25,11 @@ User.prototype.validate = function () {
 		this.creditcard_type = this.data.creditcard_type;
 		this.creditcard_number = this.data.creditcard_number;
 		this.creditcard_validity = this.data.creditcard_validity;
-		//TODO check data types and creditcard date
+
+        var d = moment(new Date(this.data.creditcard_validity));
+        if(d == null || !d.isValid()) return false;
+        if(moment().diff(d,'months', true) >= 1) return false;
+
 		return true;
 	}
 	return false;

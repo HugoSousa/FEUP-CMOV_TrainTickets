@@ -638,22 +638,50 @@ exports.getRoute = function (from, to, time, date, cb) {
 exports.registeruser = function (user, cb) {
 //TODO add credit card supp
 //TODO remove id number
-  connection.query('insert into user(name, username, password, cc_id) values (?,?,?,1)',[user.name, user.username, user.password], function (err, rows, fields) {
-    if (!err){
-        console.log(rows);
-        cb(null, rows);
+
+connection.beginTransaction(function(err) {
+  if (err) cb(err,null);
+  else {
+    connection.query('insert into credit_card(type,number,validity) values(?,?,?)', 
+      [user.creditcard_type, user.creditcard_number, user.creditcard_validity], function(err, result) {
+        if (err) {
+         connection.rollback(function() {
+          cb(err,null);
+        });
+       }
+       else {
+        var credit_id = result.insertId;
+        connection.query('insert into user(name, username, password, cc_id) values (?,?,?,?)',[user.name, user.username, user.password,credit_id], function (err, rows, fields) {
+          if (!err){
+            connection.commit(function(err) {
+              if (err) {
+               connection.rollback(function() {
+                cb(err,null);
+              });
+             }
+             else
+               cb(null, rows);
+           });
+          }
+          else{
+           connection.rollback(function() {
+            cb(err,null);
+          });
+
+         }
+       }
+       );
+
       }
-      else{
-        console.log('Error while performing Query.', err);
-        cb(err,null);
-      }
-  });
+    });
+  }
+});
 }
 
 exports.getUserByUsername = function (username, cb) {
 //TODO add credit card supp
 //TODO remove id number
-  connection.query('select * from user where username = ?',[username], function (err, rows, fields) {
+  connection.query('select * from user,credit_card where username = ? and credit_card.id = user.cc_id',[username], function (err, rows, fields) {
     if (!err){
         console.log(rows[0]);
         cb(null, rows[0]);
