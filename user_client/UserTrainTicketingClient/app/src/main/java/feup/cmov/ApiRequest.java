@@ -34,9 +34,12 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
         ROUTES,
         STATIONS,
         TICKETS,
-        PING
+        PING,
+        REGISTER,
+        BUY_TICKET
     }
     private requestCode requestCode;
+    private String token;
 
     ApiRequest(int requestType, OnApiRequestCompleted listener, requestCode requestCode){
         this.requestType = requestType;
@@ -117,7 +120,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
         return null;
     }
-    
+
     private static String getResponseText(InputStream inStream) {
         return new Scanner(inStream).useDelimiter("\\A").next();
     }

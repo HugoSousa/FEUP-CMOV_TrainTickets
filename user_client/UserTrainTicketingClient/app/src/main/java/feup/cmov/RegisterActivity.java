@@ -1,6 +1,7 @@
 package feup.cmov;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,11 +12,15 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements OnApiRequestCompleted{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,13 +175,30 @@ public class RegisterActivity extends AppCompatActivity {
                 ccNumberTV.setText("Invalid credit card number. Should have between 15 and 19 digits.");
             }else{
                 //send register request to server
-                ApiRequest request = new ApiRequest(this, LoginActivity.class, null, ApiRequest.POST, null);
+                //ApiRequest request = new ApiRequest(this, LoginActivity.class, null, ApiRequest.POST, null);
+                ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.REGISTER);
                 request.execute("register", "");
                 finish();
             }
-
-
         }
+    }
 
+    @Override
+    public void onTaskCompleted(JSONObject result, ApiRequest.requestCode requestCode) {
+        if(requestCode == ApiRequest.requestCode.REGISTER){
+            try {
+                JSONObject res = result.getJSONObject("result");
+                if(res.has("error")){
+                    String error = res.getString("error");
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                }else{
+                    //successful register
+                    Intent loginIntent = new Intent(this, LoginActivity.class);
+                    startActivity(loginIntent);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

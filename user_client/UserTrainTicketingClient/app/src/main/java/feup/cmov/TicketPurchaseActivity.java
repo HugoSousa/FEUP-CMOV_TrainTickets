@@ -1,5 +1,6 @@
 package feup.cmov;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public class TicketPurchaseActivity extends AppCompatActivity {
+public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRequestCompleted{
     private String from = null;
     private String to = null;
     private String date = null;
@@ -209,7 +211,8 @@ public class TicketPurchaseActivity extends AppCompatActivity {
     public void buyTickets(View view){
 
         SharedPreferences sp = this.getSharedPreferences("stations", 0);
-        ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.POST, null);
+        ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.BUY_TICKET);
+
         JSONObject data = new JSONObject();
         try {
             data.put("to", to);
@@ -221,7 +224,7 @@ public class TicketPurchaseActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        request.execute("tickets/purchase",data.toString());
+        request.execute("tickets/purchase", data.toString());
 
     }
     private String getStationName(String id){
@@ -229,5 +232,24 @@ public class TicketPurchaseActivity extends AppCompatActivity {
         SharedPreferences sp = this.getSharedPreferences("stations", 0);
 
         return sp.getString(id, null);
+    }
+
+    @Override
+    public void onTaskCompleted(JSONObject result, ApiRequest.requestCode requestCode) {
+        if(requestCode == ApiRequest.requestCode.BUY_TICKET){
+            if(!result.has("error")){
+                //success
+                //redirect to tickets
+                Intent ticketsIntent = new Intent(this, TicketsActivity.class);
+                startActivity(ticketsIntent);
+            }else{
+                try {
+                    String error = result.getString("error");
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
