@@ -130,12 +130,73 @@ var route_affectances = [
   affects: ["CENTRAL-C/CENTRAL"]
 }];
 
+
+var simple_routes = [
+{
+  start:"A",
+  end:"B",
+  points: ["A","A/CENTRAL","CENTRAL","B/CENTRAL","B"]
+},
+{
+  start:"B",
+  end:"A",
+  points: ["B","B/CENTRAL","CENTRAL","A/CENTRAL","A"]
+},
+{
+  start:"C",
+  end:"CENTRAL",
+  points: ["C","C/CENTRAL","CENTRAL"]
+},
+{
+  start:"CENTRAL",
+  end:"C",
+  points: ["CENTRAL","C/CENTRAL","C"]
+}
+];
 /*-------------------------------------------------------------------------------------*/
 
 exports.teste = function () {
   //checkTrainCapacity(1,4,null,2);
 }
 
+exports.getSimpleTrains = function(cb) {
+  var simpleTrains = [];
+  simple_routes.forEach(function(value, index) {
+    var route = {};
+    route.start = value.start;
+    route.end = value.end;
+    route.start_id = stations.indexOf(route.start);
+    route.end_id = stations.indexOf(route.end);
+    simpleTrains.push(route);
+  });
+
+
+  async.each(simpleTrains, function(train, callback) {
+
+        exports.getTrainTimes(train.start_id, train.end_id, function(err, data){
+      if (err) {
+              console.log("ERROR : ",err);            
+          } else { 
+              var trips = [];
+              data.trips.forEach(function(trip,ind) {
+                trips.push( {
+                  start_time: trip.times[0],
+                  end_time: trip.times[trip.times.length-1],
+                  train: trip.train
+                });
+              })           
+              train.trips = trips;   
+          }
+          callback();    
+    });
+    
+  },
+  function (err) {
+    cb(null, simpleTrains);
+  }
+  );
+ 
+}
 
 exports.getTrainTimesTest = function (from, to, cb){
 
@@ -259,7 +320,7 @@ exports.getTrainTimes = function (from, to, cb) {
             cb(err1, null);
           }
           
-          console.log(JSON.stringify(result));
+          //console.log(JSON.stringify(result));
         });       
       }
       else{
@@ -509,6 +570,27 @@ exports.getStations = function (cb) {
   });
 }
 
+exports.getAllTickets = function(from,to,time,date,cb) {
+ exports.getSimpleTrains(function(err, simpleTrains){
+    if (err) {
+            cb(err,null);          
+        } else {       
+            var found = false;     
+            simpleTrains.forEach(function (train, index) {
+              if (train.start_id == from && train.end_id == to) {
+                train.trips.forEach(function(trip) {
+                  if (trip.start_time == time) found = true;
+                });
+              }
+            });
+            if (!found) cb('Unrecognized trip', null);
+            else {
+              //validate date format??
+              // --
+            }
+        }  
+  });
+}
 exports.getRoute = function (from, to, time, date, cb) {
 
   //se switch_central = 1, tem de buscar de from -> 3 + 3 -> to
