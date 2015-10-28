@@ -209,7 +209,7 @@ public class TicketPurchaseActivity extends AppCompatActivity {
     public void buyTickets(View view){
 
         SharedPreferences sp = this.getSharedPreferences("stations", 0);
-        ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.POST);
+        ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.POST, null);
         JSONObject data = new JSONObject();
         try {
             data.put("to", to);

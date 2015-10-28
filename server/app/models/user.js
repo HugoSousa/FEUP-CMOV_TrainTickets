@@ -56,7 +56,7 @@ User.login = function (username, password, res, app) {
             }
 
             if (!user || password != user.password) {
-                return res.status(401).json({
+                return res.status(400).json({
                     error: "Wrong Credentials"
                 });
             }
@@ -88,7 +88,7 @@ User.loginemployee = function (email, password, res, app) {
             }
 
             if (!user || password != user.password) {
-                return res.status(401).json({
+                return res.status(400).json({
                     error: "Wrong Credentials"
                 });
             }

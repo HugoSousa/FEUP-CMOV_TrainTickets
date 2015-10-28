@@ -32,7 +32,7 @@ public class RoutesListActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         String routesString = (String)extras.get("data");
-        String date = (String)extras.getBundle("other").get("date");
+        String date = (String)extras.get("date");
 
         ((TextView)findViewById(R.id.text_route_date)).setText(date);
 

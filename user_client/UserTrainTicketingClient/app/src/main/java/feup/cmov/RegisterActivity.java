@@ -170,7 +170,7 @@ public class RegisterActivity extends AppCompatActivity {
                 ccNumberTV.setText("Invalid credit card number. Should have between 15 and 19 digits.");
             }else{
                 //send register request to server
-                ApiRequest request = new ApiRequest(this, LoginActivity.class, null, ApiRequest.POST);
+                ApiRequest request = new ApiRequest(this, LoginActivity.class, null, ApiRequest.POST, null);
                 request.execute("register", "");
                 finish();
             }

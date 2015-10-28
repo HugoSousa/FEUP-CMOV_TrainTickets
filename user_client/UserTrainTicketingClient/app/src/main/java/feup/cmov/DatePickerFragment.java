@@ -16,10 +16,14 @@ import java.util.Calendar;
 public class DatePickerFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
-    ListenerActivity listener;
+    public ListenerActivity listener;
 
     public interface ListenerActivity{
-        public void updateDate(String date);
+        void updateDate(String date);
+    }
+
+    DatePickerFragment(ListenerActivity listener){
+        this.listener = listener;
     }
 
     @Override
@@ -29,7 +33,6 @@ public class DatePickerFragment extends DialogFragment
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
-        listener = (ListenerActivity) getActivity();
 
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dp = new DatePickerDialog(getActivity(), this, year, month, day);

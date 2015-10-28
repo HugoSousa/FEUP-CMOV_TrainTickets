@@ -280,7 +280,7 @@ router.route('/tickets/listing')
 
 router.route('/ping')
 .get(function(req, res) {
-	res.status(200).json();
+	res.status(200).json({ result: {message:'Sucess'} });
 	//res.json({ result: {message:'Sucess'} });
 })
 

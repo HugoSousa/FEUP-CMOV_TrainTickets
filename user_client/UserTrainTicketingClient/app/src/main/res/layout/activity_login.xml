@@ -23,7 +23,8 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/edit_username"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -35,7 +36,8 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:id="@+id/edit_password"/>
 
     <Button
         android:layout_width="match_parent"

@@ -1,11 +1,8 @@
 package feup.cmov;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -22,27 +19,35 @@ import java.util.Scanner;
  */
 public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
+    private OnApiRequestCompleted listener;
+
     public static int GET = 1;
     public static int POST = 2;
     private int requestType;
-    private Context context;
-    private Class redirect;
-    private Bundle data;
-    private final String API_URL = "http://192.168.1.65:8080/api/";
-    //private final String API_URL = "http://172.30.9.206:8080/api/";
 
-    ApiRequest(Context context, Class redirect, Bundle data, int requestType){
-        this.context = context;
-        this.redirect = redirect;
-        this.data = data;
+    //private final String API_URL = "http://192.168.1.65:8080/api/";
+    private final String API_URL = "http://172.30.33.222:8080/api/";
+
+    public enum requestCode {
+        LOGIN,
+        ROUTE,
+        ROUTES,
+        STATIONS,
+        TICKETS,
+        PING
+    }
+    private requestCode requestCode;
+
+    ApiRequest(int requestType, OnApiRequestCompleted listener, requestCode requestCode){
         this.requestType = requestType;
+        this.listener = listener;
+        this.requestCode = requestCode;
     }
 
     @Override
     protected JSONObject doInBackground(String... params) {
 
         try{
-            //JSONObject result = requestWebService("http://172.30.9.206:8080/api/route?from=1&to=4");
             JSONObject result = null;
             if(requestType == GET)
                 result = requestWebService(API_URL + params[0], GET, null);
@@ -59,22 +64,8 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject result)
     {
-        //System.out.println(result);
-        //create new activity with list of routes
-        if(result != null) {
-            if(redirect != null) {
-                System.out.println("ON POST EXECUTE");
-                Intent intent = new Intent(context, redirect);
-                intent.putExtra("data", result.toString());
-                if(data != null)
-                    intent.putExtra("other", data);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-
-            }
-        }else{
-            Toast.makeText(context, "Can't retrieve your search. Please check if you you're connected to Internet.", Toast.LENGTH_LONG).show();
-        }
+        if(listener != null)
+            listener.onTaskCompleted(result, requestCode);
     }
 
     public static JSONObject requestWebService(String serviceUrl, int requestType, String query) throws SocketTimeoutException {
@@ -86,7 +77,6 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
             URL urlToRequest = new URL(serviceUrl);
             urlConnection = (HttpURLConnection)urlToRequest.openConnection();
             urlConnection.setConnectTimeout(5000);
-            //urlConnection.setReadTimeout(DATARETRIEVAL_TIMEOUT);
 
             if(requestType == ApiRequest.POST) {
                 urlConnection.setDoOutput(true); // Triggers POST.
@@ -99,17 +89,18 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
                     throw e;
                 }
             }
+            InputStream in = null;
 
             // handle issues
             int statusCode = urlConnection.getResponseCode();
             if (statusCode == HttpURLConnection.HTTP_OK) {
-
+                in = new BufferedInputStream(urlConnection.getInputStream());
             } else{
                 // handle any other errors, like 404, 500,..
+                in = new BufferedInputStream(urlConnection.getErrorStream());
             }
 
             // create JSON object from content
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             return new JSONObject(getResponseText(in));
         } catch(SocketTimeoutException e){
             System.out.println("Error: " + e);
@@ -126,9 +117,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
 
         return null;
     }
-
-
-
+    
     private static String getResponseText(InputStream inStream) {
         return new Scanner(inStream).useDelimiter("\\A").next();
     }

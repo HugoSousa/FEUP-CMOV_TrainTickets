@@ -1,5 +1,6 @@
 package feup.cmov;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +14,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class InitialActivity extends AppCompatActivity {
+import org.json.JSONObject;
+
+public class InitialActivity extends AppCompatActivity implements OnApiRequestCompleted{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +24,6 @@ public class InitialActivity extends AppCompatActivity {
         setContentView(R.layout.activity_initial);
 
         if(isNetworkConnected()) {
-            System.out.println("NO INTERNET");
             redirectIfServerUp();
         }else{
             Toast.makeText(this, "You have no internet connection. You're now in offline mode.", Toast.LENGTH_LONG).show();
@@ -61,7 +63,23 @@ public class InitialActivity extends AppCompatActivity {
 
     private void redirectIfServerUp(){
 
-        MainActivityCheckServerUpTask serverUp = new MainActivityCheckServerUpTask(this);
-        serverUp.execute();
+        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.PING);
+        request.execute("ping");
+    }
+
+    @Override
+    public void onTaskCompleted(JSONObject result, ApiRequest.requestCode requestCode) {
+
+        if(requestCode == ApiRequest.requestCode.PING) {
+
+            if (result != null) {
+                //server is up
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "Server is down. Please try again later.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

@@ -1,6 +1,5 @@
 package feup.cmov;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,16 +12,15 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
  * Created by Hugo on 20/10/2015.
  */
-public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
+public class ExpandableListViewAdapter extends BaseExpandableListAdapter implements OnApiRequestCompleted{
 
     private static final class ViewHolder {
         TextView textLabel;
@@ -159,7 +157,8 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
                     } else {
                         //user logged in
 
-                        ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class, null, ApiRequest.GET);
+                        //ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class, null, ApiRequest.GET, null);
+                        ApiRequest request = new ApiRequest(ApiRequest.GET, ExpandableListViewAdapter.this, ApiRequest.requestCode.ROUTE);
                         request.execute("route?from=" + r.stationTimes.get(0).station + "&to=" + r.stationTimes.get(r.stationTimes.size() - 1).station + "&time=" + r.stationTimes.get(0).time + "&date=" + date);
                     }
                 }
@@ -204,6 +203,18 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return false;
     }
+
+
+    @Override
+    public void onTaskCompleted(JSONObject result, ApiRequest.requestCode requestCode) {
+        if(requestCode == ApiRequest.requestCode.ROUTE){
+            Intent intent = new Intent(context, TicketPurchaseActivity.class);
+            intent.putExtra("data", result.toString());
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+    }
+
 
     private String getStationName(String id){
 

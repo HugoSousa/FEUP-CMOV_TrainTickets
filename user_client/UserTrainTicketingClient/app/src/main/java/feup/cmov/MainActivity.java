@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity implements DatePickerFragment.ListenerActivity{
+public class MainActivity extends AppCompatActivity implements OnApiRequestCompleted {
 
     private ArrayList<Station> stationsFromList;
     private ArrayList<Station> stationsToList;
@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
     private ArrayAdapter<Station> adapter_from;
     private ArrayAdapter<Station> adapter_to;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -42,104 +41,8 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
 
         stationsFromList = new ArrayList<Station>();
 
-        ApiRequest request = new ApiRequest(this, null, null, ApiRequest.GET);
-        try {
-            //TODO if no internet or server down, application crashes right away
-            JSONObject result = request.execute("stations").get();
-            JSONArray stations = (JSONArray)result.get("stations");
-
-            SharedPreferences sp = this.getSharedPreferences("stations", 0);
-            SharedPreferences.Editor editor = sp.edit();
-
-            for(int i = 0; i < stations.length(); i++){
-                JSONObject station = (JSONObject)stations.get(i);
-                stationsFromList.add(new Station((String) station.get("name"), (int) station.get("id")));
-                editor.putString(station.get("id").toString(), (String) station.get("name"));
-            }
-
-            editor.commit();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        /*
-
-        System.out.println("STATIONS: " + stationsFromList);
-
-        stationsFromList.add(new Station("A", 1));
-        stationsFromList.add(new Station("A/CENTRAL", 2));
-        stationsFromList.add(new Station("CENTRAL", 3));
-        stationsFromList.add(new Station("B", 4));
-        stationsFromList.add(new Station("B/CENTRAL", 5));
-        stationsFromList.add(new Station("C", 6));
-        stationsFromList.add(new Station("C/CENTRAL", 7));
-        */
-
-        stationsToList = new ArrayList<Station>(stationsFromList);
-        stationsCopy = new ArrayList<Station>(stationsToList);
-
-        Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
-        adapter_from = new ArrayAdapter<Station>(this, R.layout.spinner_centered_textview, stationsFromList); // initialize the adapter
-        adapter_from.setDropDownViewResource(R.layout.spinner_centered_textview);
-        spinner_from.setAdapter(adapter_from);
-
-        final Spinner spinner_to = (Spinner) findViewById(R.id.spinner_to);
-        adapter_to = new ArrayAdapter<Station>(this, R.layout.spinner_centered_textview, stationsToList); // initialize the adapter
-        adapter_to.setDropDownViewResource(R.layout.spinner_centered_textview);
-        spinner_to.setAdapter(adapter_to);
-
-        stationsFromList.remove(1);
-        adapter_to.notifyDataSetChanged();
-        adapter_from.notifyDataSetChanged();
-
-        spinner_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                stationsToList.clear();
-                //remove the same element from the list
-                for(int i = 0; i < stationsCopy.size(); i++){
-                    if(! stationsCopy.get(i).name.equals(stationsFromList.get(position).name)){
-                        //System.out.println("ADDED " + stationsCopy.get(i));
-                        stationsToList.add(stationsCopy.get(i));
-                    }
-                }
-
-                //adapter_from.notifyDataSetChanged();
-                //adapter_to.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        spinner_to.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("SPINNER TO CLICKED");
-
-                stationsFromList.clear();
-                //remove the same element from the list
-                for (int i = 0; i < stationsCopy.size(); i++) {
-                    if (!stationsCopy.get(i).name.equals(stationsToList.get(position).name)) {
-                        stationsFromList.add(stationsCopy.get(i));
-                    }
-                }
-                //adapter_from.notifyDataSetChanged();
-                //adapter_to.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
+        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.STATIONS);
+        request.execute("stations");
     }
 
     @Override
@@ -193,9 +96,21 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             SharedPreferences.Editor editor = sp.edit();
             editor.putString("token", null);
             editor.commit();
+
+            SharedPreferences spRoute = this.getSharedPreferences("route", 0);
+            SharedPreferences.Editor editorRoute = spRoute.edit();
+            editorRoute.putString("route", null);
+            editorRoute.putString("route_from", null);
+            editorRoute.putString("route_to", null);
+            editorRoute.putString("route_time", null);
+            editorRoute.putString("route_date", null);
+            editorRoute.commit();
+
             invalidateOptionsMenu();
+
         }else if(id == R.id.action_tickets){
-            ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.GET);
+            //ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.GET, null);
+            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.TICKETS);
             request.execute("teste");
         }
 
@@ -203,17 +118,24 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
     }
 
     public void showDatePickerDialog(View v) {
-        DialogFragment newFragment = new DatePickerFragment();
+        DialogFragment newFragment = new DatePickerFragment(new DatePickerFragment.ListenerActivity() {
+            @Override
+            public void updateDate(String date) {
+                TextView dateTextView = (TextView)findViewById(R.id.date_text);
+                dateTextView.setText(date);
+            }
+        });
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
-
+    /*
     @Override
     public void updateDate(String date) {
         System.out.println("OI");
         TextView dateTextView = (TextView)findViewById(R.id.date_text);
         dateTextView.setText(date);
     }
+    */
 
     public void searchRoutes(View v){
 
@@ -232,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
             Bundle bundle = new Bundle();
             bundle.putString("date", date);
 
-            ApiRequest request = new ApiRequest(getApplicationContext(), RoutesListActivity.class, bundle, ApiRequest.GET);
+            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.ROUTES);
             //get id from and to
             Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
             int fromPosition = spinner_from.getSelectedItemPosition();
@@ -252,6 +174,106 @@ public class MainActivity extends AppCompatActivity implements DatePickerFragmen
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         return (cm.getActiveNetworkInfo() != null);
+    }
+
+    @Override
+    public void onTaskCompleted(JSONObject result, ApiRequest.requestCode requestCode) {
+
+        if(result != null){
+            if(requestCode == ApiRequest.requestCode.ROUTES){
+                //redirect to routes
+                Intent intent = new Intent(this, RoutesListActivity.class);
+                intent.putExtra("data", result.toString());
+                intent.putExtra("other", ((TextView) findViewById(R.id.date_text)).getText().toString());
+                startActivity(intent);
+
+            }else if(requestCode == ApiRequest.requestCode.STATIONS){
+
+
+                try {
+                    JSONArray stations = (JSONArray)result.get("stations");
+
+                    SharedPreferences sp = this.getSharedPreferences("stations", 0);
+                    SharedPreferences.Editor editor = sp.edit();
+
+                    for(int i = 0; i < stations.length(); i++){
+                        JSONObject station = (JSONObject)stations.get(i);
+                        stationsFromList.add(new Station((String) station.get("name"), (int) station.get("id")));
+                        editor.putString(station.get("id").toString(), (String) station.get("name"));
+                    }
+
+                    editor.commit();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                stationsToList = new ArrayList<Station>(stationsFromList);
+                stationsCopy = new ArrayList<Station>(stationsToList);
+
+                Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
+                adapter_from = new ArrayAdapter<Station>(this, R.layout.spinner_centered_textview, stationsFromList); // initialize the adapter
+                adapter_from.setDropDownViewResource(R.layout.spinner_centered_textview);
+                spinner_from.setAdapter(adapter_from);
+
+                final Spinner spinner_to = (Spinner) findViewById(R.id.spinner_to);
+                adapter_to = new ArrayAdapter<Station>(this, R.layout.spinner_centered_textview, stationsToList); // initialize the adapter
+                adapter_to.setDropDownViewResource(R.layout.spinner_centered_textview);
+                spinner_to.setAdapter(adapter_to);
+
+                stationsFromList.remove(1);
+                adapter_to.notifyDataSetChanged();
+                adapter_from.notifyDataSetChanged();
+
+                spinner_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        stationsToList.clear();
+                        //remove the same element from the list
+                        for (int i = 0; i < stationsCopy.size(); i++) {
+                            if (!stationsCopy.get(i).name.equals(stationsFromList.get(position).name)) {
+                                //System.out.println("ADDED " + stationsCopy.get(i));
+                                stationsToList.add(stationsCopy.get(i));
+                            }
+                        }
+
+                        //adapter_from.notifyDataSetChanged();
+                        //adapter_to.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+
+                spinner_to.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        System.out.println("SPINNER TO CLICKED");
+
+                        stationsFromList.clear();
+                        //remove the same element from the list
+                        for (int i = 0; i < stationsCopy.size(); i++) {
+                            if (!stationsCopy.get(i).name.equals(stationsToList.get(position).name)) {
+                                stationsFromList.add(stationsCopy.get(i));
+                            }
+                        }
+                        //adapter_from.notifyDataSetChanged();
+                        //adapter_to.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }else if(requestCode == ApiRequest.requestCode.TICKETS){
+                Intent intent = new Intent(this, TicketsActivity.class);
+                intent.putExtra("data", result.toString());
+                startActivity(intent);
+            }
+        }
     }
 }
 
