@@ -77,6 +77,17 @@ router.route('/login')
 		}
 })
 
+router.route('/loginemployee')
+.post(function(req, res) {
+	if (req.body.email != undefined && req.body.email != "" && req.body.password != undefined && req.body.password != "") {
+		User.loginemployee(req.body.email, req.body.password, res, req.app);
+	} else {
+		res.status(400).json({
+			error: "Invalid request"
+		});
+	}
+})
+
 app.get("/api/testlogin", [userauth], function (req, res) {
 	res.send(req.user);
 });

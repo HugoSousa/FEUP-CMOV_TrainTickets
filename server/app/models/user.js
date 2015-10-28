@@ -49,9 +49,9 @@ User.findById = function (id, callback) {
 User.login = function (username, password, res, app) {
         database.getUserByUsername(username, function (err, user) {
 
-            if (err) {
+            if (err  || typeof user == 'undefined') {
                 return res.status(400).json({
-                    error: err
+                    error: 'User not found'
                 });
             }
 
@@ -64,6 +64,38 @@ User.login = function (username, password, res, app) {
             var expires = moment().add(7, 'days').valueOf();
             var token = jwt.encode({
                 iss: user.username,
+                exp: expires
+            }, app.get('jwtTokenSecret'));
+
+            delete user.password;
+            res.json({
+                token  : token,
+                expires: expires,
+                user   : user
+            });
+        })
+};
+
+User.loginemployee = function (email, password, res, app) {
+        database.getEmployeeByEmail(email, function (err, user) {
+            console.log(err);
+            console.log(user);
+
+            if (err || typeof user == 'undefined') {
+                return res.status(400).json({
+                    error: 'Employee not found'
+                });
+            }
+
+            if (!user || password != user.password) {
+                return res.status(401).json({
+                    error: "Wrong Credentials"
+                });
+            }
+
+            var expires = moment().add(7, 'days').valueOf();
+            var token = jwt.encode({
+                iss: user.email,
                 exp: expires
             }, app.get('jwtTokenSecret'));
 
