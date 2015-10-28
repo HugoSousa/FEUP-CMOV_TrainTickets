@@ -680,11 +680,22 @@ connection.beginTransaction(function(err) {
 }
 
 exports.getUserByUsername = function (username, cb) {
-//TODO add credit card supp
-//TODO remove id number
   connection.query('select * from user,credit_card where username = ? and credit_card.id = user.cc_id',[username], function (err, rows, fields) {
     if (!err){
         console.log(rows[0]);
+        cb(null, rows[0]);
+      }
+      else{
+        console.log('Error while performing Query.', err);
+        cb(err,null);
+      }
+  });
+}
+
+exports.getEmployeeByEmail = function (email, cb) {
+  connection.query('select * from employee where email = ?',[email], function (err, rows, fields) {
+    if (!err){
+        //console.log(rows[0]);
         cb(null, rows[0]);
       }
       else{

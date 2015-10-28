@@ -6,7 +6,8 @@ var express    = require('express');
 var bodyParser = require('body-parser');
 var app        = express();
 var morgan     = require('morgan');
-var jwtauth = require('./app/modules/jwtAuth.js');
+var userauth = require('./app/modules/userAuth.js');
+var employeeauth = require('./app/modules/employeeAuth.js');
 
 var async = require('async');
 
@@ -76,7 +77,11 @@ router.route('/login')
 		}
 })
 
-app.get("/api/testlogin", [jwtauth], function (req, res) {
+app.get("/api/testlogin", [userauth], function (req, res) {
+	res.send(req.user);
+});
+
+app.get("/api/testemployee", [employeeauth], function (req, res) {
 	res.send(req.user);
 });
 
