@@ -41,10 +41,11 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
     private requestCode requestCode;
     private String token;
 
-    ApiRequest(int requestType, OnApiRequestCompleted listener, requestCode requestCode){
+    ApiRequest(int requestType, OnApiRequestCompleted listener, requestCode requestCode, String token){
         this.requestType = requestType;
         this.listener = listener;
         this.requestCode = requestCode;
+        this.token = token;
     }
 
     @Override
@@ -53,9 +54,9 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
         try{
             JSONObject result = null;
             if(requestType == GET)
-                result = requestWebService(API_URL + params[0], GET, null);
+                result = requestWebService(API_URL + params[0], GET, null, token);
             else if(requestType == POST)
-                result = requestWebService(API_URL + params[0], POST, params[1]);
+                result = requestWebService(API_URL + params[0], POST, params[1], token);
             return result;
         }catch(SocketTimeoutException e){
             System.out.println("Connection timed out. Show a warning to the user.");
@@ -71,7 +72,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
             listener.onTaskCompleted(result, requestCode);
     }
 
-    public static JSONObject requestWebService(String serviceUrl, int requestType, String query) throws SocketTimeoutException {
+    public static JSONObject requestWebService(String serviceUrl, int requestType, String query, String token) throws SocketTimeoutException {
         //disableConnectionReuseIfNecessary();
 
         HttpURLConnection urlConnection = null;
@@ -79,6 +80,8 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
             // create connection
             URL urlToRequest = new URL(serviceUrl);
             urlConnection = (HttpURLConnection)urlToRequest.openConnection();
+            if(token != null)
+                urlConnection.setRequestProperty("x-access-token", token);
             urlConnection.setConnectTimeout(5000);
 
             if(requestType == ApiRequest.POST) {

@@ -63,7 +63,7 @@ public class InitialActivity extends AppCompatActivity implements OnApiRequestCo
 
     private void redirectIfServerUp(){
 
-        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.PING);
+        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.PING, null);
         request.execute("ping");
     }
 

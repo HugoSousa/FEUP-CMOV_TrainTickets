@@ -237,10 +237,8 @@ router.route('/schedule/detail')
 // =============================================================================	
 
 router.route('/tickets/purchase')
-	.post(function(req, res) {
-		var user_id = 1;
-		// TODO check if req has login enabled
-		// TODO check if trip data is present
+	.post([userauth], function(req, res) {
+		var user_id = req.user.id;
 		var from = req.body.from;
 		var to = req.body.to;
 		var date = req.body.date;
@@ -255,9 +253,6 @@ router.route('/tickets/purchase')
 				res.json(data);
 			}
 		});
-
-
-		
 })
 
 

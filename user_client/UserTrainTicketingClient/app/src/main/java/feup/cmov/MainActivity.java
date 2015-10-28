@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnApiRequestCompl
 
         stationsFromList = new ArrayList<Station>();
 
-        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.STATIONS);
+        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.STATIONS, null);
         request.execute("stations");
     }
 
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements OnApiRequestCompl
 
         }else if(id == R.id.action_tickets){
             //ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.GET, null);
-            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.TICKETS);
+            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.TICKETS, null);
             request.execute("teste");
         }
 
@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements OnApiRequestCompl
             Bundle bundle = new Bundle();
             bundle.putString("date", date);
 
-            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.ROUTES);
+            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.ROUTES, null);
             //get id from and to
             Spinner spinner_from = (Spinner) findViewById(R.id.spinner_from);
             int fromPosition = spinner_from.getSelectedItemPosition();

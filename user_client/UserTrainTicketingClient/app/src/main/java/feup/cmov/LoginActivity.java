@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
             e.printStackTrace();
         }
 
-        ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.LOGIN);
+        ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.LOGIN, null);
         request.execute("login", body.toString());
 
     }
@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
 
                         System.out.println("Redirect to TicketPurchaseActivity");
                         finish();
-                        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.ROUTE); //will redirect to purchase of ticket with info of the route
+                        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.ROUTE, null);
                         request.execute("route?from=" + routeFrom + "&to=" + routeTo + "&time=" + routeTime + "&date=" + routeDate);
 
                     }

@@ -158,7 +158,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
                         //user logged in
 
                         //ApiRequest request = new ApiRequest(context, TicketPurchaseActivity.class, null, ApiRequest.GET, null);
-                        ApiRequest request = new ApiRequest(ApiRequest.GET, ExpandableListViewAdapter.this, ApiRequest.requestCode.ROUTE);
+                        ApiRequest request = new ApiRequest(ApiRequest.GET, ExpandableListViewAdapter.this, ApiRequest.requestCode.ROUTE, null);
                         request.execute("route?from=" + r.stationTimes.get(0).station + "&to=" + r.stationTimes.get(r.stationTimes.size() - 1).station + "&time=" + r.stationTimes.get(0).time + "&date=" + date);
                     }
                 }

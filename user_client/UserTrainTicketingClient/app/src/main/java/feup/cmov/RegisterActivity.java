@@ -176,7 +176,7 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
             }else{
                 //send register request to server
                 //ApiRequest request = new ApiRequest(this, LoginActivity.class, null, ApiRequest.POST, null);
-                ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.REGISTER);
+                ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.REGISTER, null);
                 request.execute("register", "");
                 finish();
             }

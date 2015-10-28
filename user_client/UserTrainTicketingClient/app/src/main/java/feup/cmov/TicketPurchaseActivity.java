@@ -210,22 +210,28 @@ public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRe
 
     public void buyTickets(View view){
 
-        SharedPreferences sp = this.getSharedPreferences("stations", 0);
-        ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.BUY_TICKET);
+        SharedPreferences sp = this.getSharedPreferences("login", 0);
+        String token = sp.getString("token", null);
+        if(token == null){
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            startActivity(loginIntent);
+            Toast.makeText(this, "You need to be logged in to buy tickets.", Toast.LENGTH_LONG).show();
+        }else {
+            ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.BUY_TICKET, token);
 
-        JSONObject data = new JSONObject();
-        try {
-            data.put("to", to);
-            data.put("from", from);
-            data.put("date", date);
-            data.put("time", time);
+            JSONObject data = new JSONObject();
+            try {
+                data.put("to", to);
+                data.put("from", from);
+                data.put("date", date);
+                data.put("time", time);
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            request.execute("tickets/purchase", data.toString());
         }
-
-        request.execute("tickets/purchase", data.toString());
-
     }
     private String getStationName(String id){
 
