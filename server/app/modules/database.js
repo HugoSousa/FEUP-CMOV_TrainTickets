@@ -159,45 +159,6 @@ exports.teste = function () {
   //checkTrainCapacity(1,4,null,2);
 }
 
-exports.getSimpleTrains = function(cb) {
-  var simpleTrains = [];
-  simple_routes.forEach(function(value, index) {
-    var route = {};
-    route.start = value.start;
-    route.end = value.end;
-    route.start_id = stations.indexOf(route.start);
-    route.end_id = stations.indexOf(route.end);
-    simpleTrains.push(route);
-  });
-
-
-  async.each(simpleTrains, function(train, callback) {
-
-        exports.getTrainTimes(train.start_id, train.end_id, function(err, data){
-      if (err) {
-              console.log("ERROR : ",err);            
-          } else { 
-              var trips = [];
-              data.trips.forEach(function(trip,ind) {
-                trips.push( {
-                  start_time: trip.times[0],
-                  end_time: trip.times[trip.times.length-1],
-                  train: trip.train
-                });
-              })           
-              train.trips = trips;   
-          }
-          callback();    
-    });
-    
-  },
-  function (err) {
-    cb(null, simpleTrains);
-  }
-  );
- 
-}
-
 exports.getTrainTimesTest = function (from, to, cb){
 
   var result = { trips: [], distance: null, price: null, switch_central: null};
@@ -570,23 +531,100 @@ exports.getStations = function (cb) {
   });
 }
 
+exports.getSimpleTrains = function(cb) {
+  var simpleTrains = [];
+  simple_routes.forEach(function(value, index) {
+    var route = {};
+    route.start = value.start;
+    route.end = value.end;
+    route.start_id = stations.indexOf(route.start);
+    route.end_id = stations.indexOf(route.end);
+    simpleTrains.push(route);
+  });
+
+
+  async.each(simpleTrains, function(train, callback) {
+
+        exports.getTrainTimes(train.start_id, train.end_id, function(err, data){
+      if (err) {
+              console.log("ERROR : ",err);            
+          } else { 
+              var trips = [];
+              data.trips.forEach(function(trip,ind) {
+                trips.push( {
+                  start_time: trip.times[0],
+                  end_time: trip.times[trip.times.length-1],
+                  train: trip.train
+                });
+              })           
+              train.trips = trips;   
+          }
+          callback();    
+    });
+    
+  },
+  function (err) {
+    cb(null, simpleTrains);
+  }
+  );
+ 
+}
+
+function getRoutePossibilites(from, to, time, cb) {
+   exports.getTrainTimes(from, to, function(err, data){
+      if (err) {
+              cb(null,err);          
+          } else { 
+            var found = false;
+            data.trips.forEach(function(trip, index) {
+              console.log(trip.times[0]);
+              console.log(time);
+              if (trip.times[0].toString() == time.toString()) found = trip;
+               
+            });
+            if (!found) cb('Couldnt find trip',null);
+            else  {
+              var combo_array = [];
+              found.stations.forEach(function(station, index, array) {
+                console.log(station);
+                for (var i = index +1; i < array.length; i++) {
+                  combo_array.push({
+                    start: station,
+                    end: array[i],
+                    time: found.times[index]
+                  })
+                }
+              });
+              cb(null,combo_array);
+            }
+          }
+    });
+}
+
 exports.getAllTickets = function(from,to,time,date,cb) {
  exports.getSimpleTrains(function(err, simpleTrains){
     if (err) {
             cb(err,null);          
         } else {       
-            var found = false;     
+            var found = false;
             simpleTrains.forEach(function (train, index) {
               if (train.start_id == from && train.end_id == to) {
                 train.trips.forEach(function(trip) {
-                  if (trip.start_time == time) found = true;
+                  if (trip.start_time == time) {
+                    found = true;
+                  }
                 });
               }
             });
             if (!found) cb('Unrecognized trip', null);
             else {
-              //validate date format??
-              // --
+              getRoutePossibilites(from, to, time, function(err, combo_array) {
+                  if (err) cb(err, null);
+                  else {
+                   // console.log(combo_array);
+                   cb(null, combo_array);
+                  }
+              });
             }
         }  
   });
