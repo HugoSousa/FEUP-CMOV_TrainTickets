@@ -585,8 +585,8 @@ function getRoutePossibilites(from, to, time, cb) {
           } else { 
             var found = false;
             data.trips.forEach(function(trip, index) {
-              console.log(trip.times[0]);
-              console.log(time);
+              //console.log(trip.times[0]);
+              //console.log(time);
               if (trip.times[0].toString() == time.toString()) found = trip;
                
             });
@@ -594,7 +594,7 @@ function getRoutePossibilites(from, to, time, cb) {
             else  {
               var combo_array = [];
               found.stations.forEach(function(station, index, array) {
-                console.log(station);
+                //console.log(station);
                 for (var i = index +1; i < array.length; i++) {
                   combo_array.push({
                     start: station,
@@ -629,8 +629,33 @@ exports.getAllTickets = function(from,to,time,date,cb) {
               getRoutePossibilites(from, to, time, function(err, combo_array) {
                   if (err) cb(err, null);
                   else {
-                   // console.log(combo_array);
-                   cb(null, combo_array);
+                    console.log(combo_array);
+                    var download_tickets = [];
+                   async.each(combo_array, function(combo, callback) {
+
+                      connection.query(
+                        'select * from ticket, route where ticket.route_id = route.id and ticket.route_date = ? and route.start_station = ? and route.end_station = ?',
+                        [date + ' ' + combo.time, combo.start, combo.end],
+                        function (err, rows, fields) {
+                          console.log(date + ' ' + combo.time);
+                          console.log(rows);
+                          for (var i = 0; i < rows.length; i++) {
+                            rows[i].uuid = Array.prototype.slice.call(rows[i].uuid, 0);
+                            rows[i].is_validated = Array.prototype.slice.call(rows[i].is_validated, 0);
+                            rows[i].signature = Array.prototype.slice.call(rows[i].signature, 0);
+                            rows[i].switch_central = Array.prototype.slice.call(rows[i].switch_central, 0);
+
+
+                            download_tickets.push(rows[i]);
+                          }
+                        callback(); 
+                        });
+                    },
+                    function (err) {
+                      cb(null, download_tickets);
+                    }
+                    );
+                   // select * from ticket, route where ticket.route_id = route.id and ticket.route_date = '2015-10-29 14:00:00' and route.start_station = 1 and route.end_station = 3;
                   }
               });
             }
