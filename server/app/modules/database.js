@@ -848,12 +848,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
 
           var route_1 = data['route_1'];
           var code = uuid.v4();
-          var obj = {code: code, route: route_id, user: user_id, date: route_date};
-          console.log(obj);
+          var obj = {code: code, route: route_1, user: user, date: datetime};
           var signature = key.sign(JSON.stringify(obj));
-          connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, datetime], function (err1, result1) {
+          connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature], function (err1, result1) {
             if (!err1){
-                console.log(JSON.stringify(result1));
                 cb(null, {message: "Successfully inserted ticket " + result1.insertId });
             }
             else{
@@ -871,7 +869,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
           connection.beginTransaction(function(err){
             if(err){ cb({error: "Trnsaction error"}, null); }
 
-            connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, datetime], function(err1, result1){
+            var code = uuid.v4();
+            var obj = {code: code, route: route_1, user: user, date: datetime};
+            var signature = key.sign(JSON.stringify(obj));
+            connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature], function(err1, result1){
               if(err1){
                 connection.rollback(function() {
                   cb(err1, null);
@@ -879,8 +880,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
               }else{
                 var time2 = data['ticket_2'][0]['time'];
                 var datetime2 = date + " " + time2;
-
-                connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_2, user, datetime2],function(err2, result2){
+                var code = uuid.v4();
+                var obj = {code: code, route: route_2, user: user, date: datetime2};
+                var signature = key.sign(JSON.stringify(obj));
+                connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_2, user, datetime2, code, signature],function(err2, result2){
                   if(err2){
                     connection.rollback(function() {
                       cb(err2, null);
