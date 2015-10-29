@@ -135,20 +135,17 @@ router.route('/stations')
 
 //return unused tickets of a user
 router.route('/tickets')
-	.get(function(req, res) {
-		//database.teste();
-		// TODO check if req has login enabled
-		// TODO return tickets from auth user
-		var user = req.query.user;
+	.get([userauth], function(req, res) {
 
-		database.getUnusedTickets(user, function(err, data){
+		var user_id = req.user.id;
+
+		database.getUnusedTickets(user_id, function(err, data){
 			if (err) {
 	            // error handling code goes here
 	            console.log("ERROR : ",err);            
 	        } else {            
 	            // code to execute on data retrieval
-	            console.log("result from db is : ", data);
-	            res.json(data);   
+	            res.json({tickets: data});   
 	        }    
 		});
 		//res.json({ result: {message:'Sucess' , tickets:[]} });

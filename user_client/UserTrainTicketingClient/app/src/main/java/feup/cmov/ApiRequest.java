@@ -26,7 +26,7 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
     private int requestType;
 
     //private final String API_URL = "http://192.168.1.65:8080/api/";
-    private final String API_URL = "http://172.30.33.222:8080/api/";
+    private final String API_URL = "http://172.30.9.206:8080/api/";
 
     public enum requestCode {
         LOGIN,

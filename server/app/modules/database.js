@@ -392,7 +392,7 @@ exports.getUnusedTickets = function (user, cb) {
 
   //TODO: instead of user parameter, get user from the authentication
 
-  connection.query('select * from ticket where user_id = ? and is_validated = (0);', [user], function (err, rows, fields) {
+  connection.query('select * from ticket t join route r on t.route_id = r.id where user_id = ? and is_validated = (0);', [user], function (err, rows, fields) {
     if (!err){
         cb(null, rows);
       }
