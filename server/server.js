@@ -133,6 +133,7 @@ router.route('/stations')
 		//res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 
+
 //return unused tickets of a user
 router.route('/tickets')
 	.get([userauth], function(req, res) {
@@ -229,7 +230,67 @@ router.route('/routes')
 	        }    
 		});		
 })
-	
+
+// EMPLOYEE ROUTING
+// =============================================================================
+
+router.route('/loginemployee')
+.post(function(req, res) {
+	if (req.body.email != undefined && req.body.email != "" && req.body.password != undefined && req.body.password != "") {
+		User.loginemployee(req.body.email, req.body.password, res, req.app);
+	} else {
+		res.status(400).json({
+			error: "Invalid request"
+		});
+	}
+})
+
+app.get("/api/testemployee", [employeeauth], function (req, res) {
+	res.send(req.user);
+});
+
+router.route('/simpletrains')
+.get(function(req, res) {
+	database.getSimpleTrains(function(err, data){
+		if (err) {
+            console.log("ERROR : ",err);            
+        } else {            
+            res.json({trains: data});   
+        }  
+	});
+	//res.json({ result: {message:'Sucess' , tickets:[]} });
+})
+
+router.route('/downloadtickets')
+	.get(function(req, res) {
+		var from = req.query.from;
+		var to = req.query.to;
+		var time = req.query.time;
+		var date = req.query.date;
+
+		if (from == undefined || !from  || from == "" ||
+			to == undefined || !to  || to == "" ||
+			time == undefined || !time  || time == "" ||
+			date == undefined || !date  || date == "") res.status(400).json({error: 'Missing request parameters'});
+		else {
+			database.getAllTickets(from, to, time, date, function(err, data){
+				if (err) {
+		           res.status(400).json({error: err});              
+		        } else {            
+		            res.json(data);   
+		        }    
+			});
+		}
+		
+})
+
+
+/*
+	Employee app workflow:
+	/api/simpletrains
+	screen 1 -> screen 2
+*/
+
 // TRAIN ROUTING
 // =============================================================================	
 

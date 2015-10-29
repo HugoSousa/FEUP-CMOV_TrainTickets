@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: trainsystem
 -- ------------------------------------------------------
--- Server version	5.6.27-log
+-- Server version	5.6.17
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -23,6 +23,15 @@ LOCK TABLES `credit_card` WRITE;
 /*!40000 ALTER TABLE `credit_card` DISABLE KEYS */;
 INSERT INTO `credit_card` VALUES (1,'VISA','4493829384712361','2017-02-01');
 /*!40000 ALTER TABLE `credit_card` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping data for table `employee`
+--
+
+LOCK TABLES `employee` WRITE;
+/*!40000 ALTER TABLE `employee` DISABLE KEYS */;
+/*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -61,7 +70,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `ticket` WRITE;
 /*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
-INSERT INTO `ticket` VALUES (1,1,1,'\0','2015-10-18 00:00:00'),(2,9,1,'\0','2015-10-18 09:00:00'),(3,7,1,'\0','2015-10-18 10:00:00'),(4,7,1,'\0','2015-10-18 10:00:00');
+INSERT INTO `ticket` VALUES (5,15,1,'\0','2015-10-29 14:00:00','\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0','\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),(6,15,1,'\0','2015-10-29 14:00:00','4ce006ed-13db-45','m)%Ø£³t™ý\n=ãeJ19P,\0ÌDƒmkéàÎ¼\'u¨¯úë5‡,ÒõÕ'),(7,7,1,'\0','2015-10-29 14:00:00','98247ad0-aba4-41','eÐ­>Ÿ*øÍƒEYèS7@é÷({éÈ\"è4•O±õývR‘ê–‹æŠ©/ÁÐîË'),(8,2,1,'\0','2015-10-29 19:00:00','f745c53d-64b2-45','qK3H{¨AÚôßX ¨„lo¢e0QCKÖ©þdvh‹eÉ\Zô3kš3ñ%z–');
 /*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,7 +90,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Hugo Sousa','hugo','hugo',1);
+INSERT INTO `user` VALUES (1,'Hugo Sousa','hugo','hugo',1),(2,'Frm','galseth','12345',1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -94,4 +103,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-27 14:04:59
+-- Dump completed on 2015-10-29 16:46:52

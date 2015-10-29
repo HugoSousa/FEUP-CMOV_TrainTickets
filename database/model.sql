@@ -128,12 +128,16 @@ CREATE TABLE `ticket` (
   `user_id` int(11) NOT NULL,
   `is_validated` bit(1) NOT NULL,
   `route_date` datetime NOT NULL,
+  `uuid` binary(16) NOT NULL,
+  `signature` binary(46) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `code_UNIQUE` (`uuid`),
+  UNIQUE KEY `signature_UNIQUE` (`signature`),
   KEY `fk_ticket_route_idx` (`route_id`),
   KEY `fk_ticket_user_idx` (`user_id`),
   CONSTRAINT `fk_ticket_route` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ticket_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -178,4 +182,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-28 14:31:47
+-- Dump completed on 2015-10-29 16:46:44
