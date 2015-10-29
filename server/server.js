@@ -8,8 +8,26 @@ var app        = express();
 var morgan     = require('morgan');
 var userauth = require('./app/modules/userAuth.js');
 var employeeauth = require('./app/modules/employeeAuth.js');
-
 var async = require('async');
+
+/*
+var NodeRSA = require('node-rsa');
+var fs = require('fs');
+
+var key = new NodeRSA(fs.readFileSync('./data/private.pem'));
+key.setOptions({signingScheme:'sha1'});
+
+
+var text = 'Hello RSA!';
+var signature = key.sign(text);
+console.log('encrypted: ', signature.length);
+
+var verification = key.verify(text,signature);
+console.log('result: ', verification)
+*/
+
+;
+
 
 // configure app
 app.use(morgan('dev')); // log requests to the console

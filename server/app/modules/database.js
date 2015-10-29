@@ -3,6 +3,14 @@
 var mysql = require('mysql');
 var async = require('async');
 var moment = require('moment');
+var uuid = require('node-uuid');
+
+
+var NodeRSA = require('node-rsa');
+var fs = require('fs');
+
+var key = new NodeRSA(fs.readFileSync('./data/private.pem'));
+key.setOptions({signingScheme:'sha1'});
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -839,7 +847,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
           //buy only ticket_1
 
           var route_1 = data['route_1'];
-
+          var code = uuid.v4();
+          var obj = {code: code, route: route_id, user: user_id, date: route_date};
+          console.log(obj);
+          var signature = key.sign(JSON.stringify(obj));
           connection.query('insert into ticket(route_id, user_id, is_validated, route_date) values (?, ?, 0, ?)', [route_1, user, datetime], function (err1, result1) {
             if (!err1){
                 console.log(JSON.stringify(result1));
