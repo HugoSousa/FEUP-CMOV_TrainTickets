@@ -39,10 +39,10 @@ public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRe
         //data of the route is in extras "data"
         Bundle extras = getIntent().getExtras();
         String routeString = (String)extras.get("data");
+        System.out.println(routeString);
 
         boolean waitingCentral = false;
 
-        //TODO fill fields with data of route
         ArrayList<Integer> stations = new ArrayList<Integer>();
         ArrayList<String> times = new ArrayList<String>();
         int price = -1, distance = -1;
@@ -233,6 +233,7 @@ public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRe
             request.execute("tickets/purchase", data.toString());
         }
     }
+
     private String getStationName(String id){
 
         SharedPreferences sp = this.getSharedPreferences("stations", 0);

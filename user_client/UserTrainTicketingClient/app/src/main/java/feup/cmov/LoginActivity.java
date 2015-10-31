@@ -49,15 +49,21 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
                     SharedPreferences sp = getSharedPreferences("login", 0);
                     SharedPreferences.Editor editor = sp.edit();
 
-                    String token = null;
+
                     try {
-                        token = result.getString("token");
+                        String token = result.getString("token");
+                        JSONObject user = result.getJSONObject("user");
+                        String userId = user.getString("id");
+
+                        editor.putString("token", token);
+                        editor.putString("id", userId);
+                        editor.commit();
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-                    editor.putString("token", token);
-                    editor.commit();
+
 
                     finish();
 

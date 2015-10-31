@@ -184,11 +184,10 @@ public class MainActivity extends AppCompatActivity implements OnApiRequestCompl
                 //redirect to routes
                 Intent intent = new Intent(this, RoutesListActivity.class);
                 intent.putExtra("data", result.toString());
-                intent.putExtra("other", ((TextView) findViewById(R.id.date_text)).getText().toString());
+                intent.putExtra("date", ((TextView) findViewById(R.id.date_text)).getText().toString());
                 startActivity(intent);
 
             }else if(requestCode == ApiRequest.requestCode.STATIONS){
-
 
                 try {
                     JSONArray stations = (JSONArray)result.get("stations");

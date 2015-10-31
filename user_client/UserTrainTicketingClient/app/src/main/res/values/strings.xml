@@ -24,6 +24,8 @@
     <string name="label_route_waiting_time">Waiting Time</string>
     <string name="label_station">Station</string>
     <string name="label_time">Time</string>
+    <string name="ticket_1">Ticket #1</string>
+    <string name="ticket_2">Ticket #2</string>
     <string name="text_offline_logged_in">You\'re in offline mode.\n\nYou can check your unused tickets.\n\nGo online for full functionality of the app. </string>
     <string name="text_offline_not_logged_in">You\'re in offline mode and you aren\'t logged in.\n\nGo online for full functionality of the app. </string>
     <string-array name="credit_card_types">
@@ -34,4 +36,7 @@
         <item>JCB</item>
         <item>OTHER</item>
     </string-array>
+    <string name="title_activity_check">check</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
