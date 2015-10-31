@@ -14,7 +14,8 @@
             android:text="@string/unused_tickets"
             android:layout_alignParentBottom="true"
             android:visibility="gone"
-            android:id="@+id/button_show_tickets"/>
+            android:id="@+id/button_show_tickets"
+            android:onClick="redirectTickets"/>
 
         <TextView
             android:layout_width="match_parent"

@@ -82,4 +82,9 @@ public class InitialActivity extends AppCompatActivity implements OnApiRequestCo
             }
         }
     }
+
+    public void redirectTickets(View view){
+        Intent ticketsActivity = new Intent(this, TicketsActivity.class);
+        startActivity(ticketsActivity);
+    }
 }

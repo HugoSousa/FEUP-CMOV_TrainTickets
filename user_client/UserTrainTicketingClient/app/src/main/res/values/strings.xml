@@ -28,6 +28,9 @@
     <string name="ticket_2">Ticket #2</string>
     <string name="text_offline_logged_in">You\'re in offline mode.\n\nYou can check your unused tickets.\n\nGo online for full functionality of the app. </string>
     <string name="text_offline_not_logged_in">You\'re in offline mode and you aren\'t logged in.\n\nGo online for full functionality of the app. </string>
+    <string name="warning_local_storage">Be careful!\n If you remove a ticket from local storage in offline mode, you can\'t have back until you\'re connected to a network again. </string>
+    <string name="local_storage">Local Storage</string>
+
     <string-array name="credit_card_types">
         <item>VISA</item>
         <item>VISAELECTRON</item>
@@ -36,7 +39,4 @@
         <item>JCB</item>
         <item>OTHER</item>
     </string-array>
-    <string name="title_activity_check">check</string>
-    <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

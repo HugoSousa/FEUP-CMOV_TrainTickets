@@ -15,7 +15,6 @@ public class Ticket {
     public String signature;
     public int distance;
     public int route;
-    public boolean isLoadedLocal;
 
     public Ticket(String code, String date, int price, String fromStation, String toStation, String signature, int distance, int route){
         this.code = code;
@@ -47,5 +46,23 @@ public class Ticket {
         }
 
         return obj;
+    }
+
+    public static Ticket JSONtoTicket(JSONObject obj, String code){
+
+        try {
+            String date = (String)obj.get("date");
+            int price = (int)obj.get("price");
+            String from = (String)obj.get("from");
+            String to = (String)obj.get("to");
+            String signature = (String)obj.get("signature");
+            int distance = (int)obj.get("distance");
+            int route = (int)obj.get("route");
+            return new Ticket(code, date, price, from, to, signature, distance, route);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

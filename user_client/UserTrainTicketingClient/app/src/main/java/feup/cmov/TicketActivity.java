@@ -20,8 +20,6 @@ public class TicketActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ticket);
 
-
-
         SharedPreferences sp = getSharedPreferences("login", 0);
 
         Bundle extras = getIntent().getExtras();
@@ -67,7 +65,7 @@ public class TicketActivity extends AppCompatActivity {
         String distance = (String)extras.get("distance");
         String price = (String)extras.get("price");
 
-        ((TextView)findViewById(R.id.text_route_from_to)).setText("FROM " + getStationName(from) + " TO " + getStationName(to));
+        ((TextView)findViewById(R.id.text_route_from_to)).setText("FROM " + from + " TO " + to);
         ((TextView)findViewById(R.id.text_route_date)).setText(date.replace(" ", "\n"));
         ((TextView)findViewById(R.id.text_route_distance)).setText(distance);
         ((TextView)findViewById(R.id.text_route_price)).setText(price);

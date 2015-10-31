@@ -33,6 +33,18 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
     public ExpandableListViewAdapter(Context context, ArrayList<Route> itemList) {
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+
+        for(int j = 0; j < itemList.size(); j++) {
+            for (int i = 0; i < itemList.get(j).stationTimes.size(); i++) {
+                if (getStationName(itemList.get(j).stationTimes.get(i).station.toString()).toUpperCase().equals("CENTRAL")) {
+                    StationTime st = new StationTime();
+                    st.station = null;
+                    st.time = null;
+                    itemList.get(j).stationTimes.add(i + 1, st);
+                    break;
+                }
+            }
+        }
         this.itemList = itemList;
     }
 
@@ -60,7 +72,6 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
 
 
         if (resultView == null) {
-
             resultView = inflater.inflate(R.layout.expandable_list_row, null); //TODO change layout id
             holder = new ViewHolder();
             holder.textLabel = (TextView) resultView.findViewById(R.id.grp_child); //TODO change view id
@@ -71,6 +82,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
 
         final StationTime item = getChild(groupPosition, childPosition);
 
+        /*
         if(childPosition > 1){
             if(getStationName(getChild(groupPosition, childPosition - 1).station.toString()).toUpperCase().equals("CENTRAL") && getGroup(groupPosition).waitingTime != -1){
                 int minutes = getGroup(groupPosition).waitingTime;
@@ -78,12 +90,29 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
                 minutes = minutes % 60;
                 DecimalFormat df = new DecimalFormat("00");
 
-                holder.textLabel.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
+                //holder.textLabel.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
+
+                //add a row with waiting time before
+                //add a new child next position
+                //addChild(childPosition - 1);
+                holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
+
             }else{
                 holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
             }
         }
         else {
+            holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
+        }
+        */
+        if(item.station == null){
+            int minutes = getGroup(groupPosition).waitingTime;
+            int hours = minutes / 60;
+            minutes = minutes % 60;
+            DecimalFormat df = new DecimalFormat("00");
+
+            holder.textLabel.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
+        }else{
             holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
         }
 

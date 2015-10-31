@@ -1,21 +1,21 @@
 package feup.cmov;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,29 +28,66 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 public class TicketsActivity extends AppCompatActivity implements OnApiRequestCompleted{
+
+    BroadcastReceiver br;
+    private static boolean firstConnect = true;
+    private ArrayList<Ticket> tickets = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tickets);
 
+        if(! isNetworkConnected()) {
+            Toast toast = Toast.makeText(this, "You have no internet connection. Only tickets from local storage are available now. Reconnect to internet to check all your tickets.", Toast.LENGTH_LONG);
+            ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+            toast.show();
+            setTicketsNoInternet();
+        }else {
+            setTicketsInternet();
+        }
 
-        //TODO se nao tem internet, abrir tickets da localStorage
+
+    }
+
+    private void setTicketsInternet() {
+        tickets.clear();
 
         SharedPreferences sp = this.getSharedPreferences("login", 0);
         String token = sp.getString("token", null);
-        if(token == null) {
-            Toast.makeText(this, "You need to be logged in to check your unused tickets.", Toast.LENGTH_LONG).show();
-        }else{
+        if (token == null) {
+            Toast toast = Toast.makeText(this, "You need to be logged in to check your unused tickets.", Toast.LENGTH_LONG);
+            ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+            toast.show();
+        } else {
             ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.TICKETS, token);
             request.execute("tickets");
         }
+    }
 
-        //do something with the tickets data.
-        //Bundle extras = getIntent().getExtras();
-        //String ticketsString = (String)extras.get("data");
+    private void setTicketsNoInternet() {
+        tickets.clear();
+
+        SharedPreferences sp = this.getSharedPreferences("tickets", 0);
+        Map<String, ?> allEntries = sp.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            //Log.d("map values", entry.getKey() + ": " + entry.getValue().toString());
+            String ticketString = sp.getString(entry.getKey(), null);
+            try {
+                if(ticketString != null) {
+                    JSONObject ticketObj = new JSONObject(ticketString);
+                    Ticket t = Ticket.JSONtoTicket(ticketObj, entry.getKey());
+                    tickets.add(t);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        setTickets(tickets);
     }
 
 
@@ -80,6 +117,32 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+        /*
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
+        */
+
+        setTickets(tickets);
+    }
+
+    private void setTickets(ArrayList<Ticket> tickets) {
+
+        if(tickets.size() == 0){
+            ((TextView)findViewById(R.id.label_info)).setText("No available tickets");
+            findViewById(R.id.label_info).setVisibility(View.VISIBLE);
+            findViewById(R.id.local_storage_actions).setVisibility(View.INVISIBLE);
+        }else{
+            findViewById(R.id.label_info).setVisibility(View.GONE);
+            findViewById(R.id.local_storage_actions).setVisibility(View.VISIBLE);
         }
 
         ListView listTickets = (ListView)findViewById(R.id.list_tickets);
@@ -115,6 +178,48 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
         return sp.getString(id, null);
     }
 
+    public void addAllLocal(View view){
+        ListView listTickets = (ListView)findViewById(R.id.list_tickets);
+        ArrayAdapter<Ticket> adapter = (ArrayAdapter<Ticket>)listTickets.getAdapter();
+        for(int i=0; i<adapter.getCount();i++){
+            Ticket t = adapter.getItem(i);
+
+            View row = listTickets.getChildAt(i);
+            ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
+
+            SharedPreferences sp = getSharedPreferences("tickets", 0);
+            SharedPreferences.Editor editor = sp.edit();
+
+            if(! ticketExistsLocally(t.code)){
+                editor.putString(t.code, t.toJSON().toString());
+                editor.commit();
+
+                symbol.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp);
+            }
+        }
+    }
+
+    public void removeAllLocal(View view){
+        ListView listTickets = (ListView)findViewById(R.id.list_tickets);
+        ArrayAdapter<Ticket> adapter = (ArrayAdapter<Ticket>)listTickets.getAdapter();
+        for(int i=0; i<adapter.getCount();i++){
+            Ticket t = adapter.getItem(i);
+
+            View row = listTickets.getChildAt(i);
+            ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
+
+            SharedPreferences sp = getSharedPreferences("tickets", 0);
+            SharedPreferences.Editor editor = sp.edit();
+
+            if(ticketExistsLocally(t.code)){
+                editor.putString(t.code, null);
+                editor.commit();
+
+                symbol.setImageResource(R.drawable.ic_add_black_24dp);
+            }
+        }
+    }
+
     class TicketAdapter extends ArrayAdapter<Ticket>{
 
         private ArrayList<Ticket> tickets;
@@ -133,6 +238,32 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                 LayoutInflater inflater=getLayoutInflater();
                 row=inflater.inflate(R.layout.ticket_list_row, parent, false);
             }
+
+            row.setClickable(true);
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SharedPreferences sp = context.getSharedPreferences("login", 0);
+                    String userId = sp.getString("id", null);
+
+                    ListView listView = (ListView) v.getParent();
+                    Ticket t = (Ticket) listView.getItemAtPosition(position);
+
+                    Intent ticketActivity = new Intent(context, TicketActivity.class);
+                    ticketActivity.putExtra("code", t.code);
+                    ticketActivity.putExtra("route", Integer.toString(t.route));
+                    ticketActivity.putExtra("date", t.date);
+                    ticketActivity.putExtra("id", userId);
+                    ticketActivity.putExtra("signature", t.signature);
+
+                    ticketActivity.putExtra("fromStation", t.fromStation);
+                    ticketActivity.putExtra("toStation", t.toStation);
+                    ticketActivity.putExtra("distance", Integer.toString(t.distance));
+                    ticketActivity.putExtra("price", Integer.toString(t.price));
+
+                    startActivity(ticketActivity);
+                }
+            });
             Ticket t = tickets.get(position);
             ((TextView)row.findViewById(R.id.ticket_text)).setText(t.toString());
             ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
@@ -149,8 +280,6 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                 @Override
                 public void onClick(View v) {
 
-                    System.out.println("AQUI");
-
                     View row = (View) v.getParent();
                     ListView listView = (ListView) row.getParent();
                     Ticket t = (Ticket) listView.getItemAtPosition(position);
@@ -164,6 +293,16 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                         editor.putString(t.code, null);
                         editor.commit();
 
+                        ListView listTickets = (ListView)findViewById(R.id.list_tickets);
+                        ArrayAdapter<Ticket> adapter = (ArrayAdapter<Ticket>)listTickets.getAdapter();
+                        tickets.remove(t);
+                        adapter.notifyDataSetChanged();
+
+                        if(tickets.size() == 0){
+                            ((TextView)findViewById(R.id.label_info)).setText("No available tickets");
+                            findViewById(R.id.label_info).setVisibility(View.VISIBLE);
+                            findViewById(R.id.local_storage_actions).setVisibility(View.INVISIBLE);
+                        }
 
                         symbol.setImageResource(R.drawable.ic_add_black_24dp);
                     }else{
@@ -182,15 +321,64 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
             return(row);
         }
 
+    }
 
-        private boolean ticketExistsLocally(String code){
-            SharedPreferences sp = getSharedPreferences("tickets", 0);
+    private boolean ticketExistsLocally(String code){
+        SharedPreferences sp = getSharedPreferences("tickets", 0);
 
-            String ticketLocal = sp.getString(code, null);
+        String ticketLocal = sp.getString(code, null);
 
-            return (ticketLocal != null);
+        return (ticketLocal != null);
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(br != null) {
+            unregisterReceiver(br);
+            firstConnect = true;
+            br = null;
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        br = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                if (isNetworkConnected()) {
+                    if(firstConnect) {
+                        firstConnect = false;
+                    }else {
+                        Toast toast = Toast.makeText(TicketsActivity.this, "You are now connected to a network again.\n You can check all your tickets.", Toast.LENGTH_LONG);
+                        ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+                        toast.show();
+                        setTicketsInternet();
+                        findViewById(R.id.add_tickets_local_storage_view).setVisibility(View.VISIBLE);
+                        findViewById(R.id.label_info).setVisibility(View.GONE);
+                    }
+                }else{
+                    if(firstConnect) {
+                        firstConnect = false;
+                    }else {
+                        Toast toast = Toast.makeText(TicketsActivity.this, "You have no internet connection.\n Only tickets from local storage are available now.\n Reconnect to internet to see all your tickets.", Toast.LENGTH_LONG);
+                        ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+                        toast.show();
+                        setTicketsNoInternet();
+                        findViewById(R.id.add_tickets_local_storage_view).setVisibility(View.GONE);
+                        findViewById(R.id.label_info).setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        };
+
+        registerReceiver(br, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+    }
 }

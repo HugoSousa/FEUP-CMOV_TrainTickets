@@ -110,8 +110,10 @@ public class MainActivity extends AppCompatActivity implements OnApiRequestCompl
 
         }else if(id == R.id.action_tickets){
             //ApiRequest request = new ApiRequest(this, TicketsActivity.class, null, ApiRequest.GET, null);
-            ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.TICKETS, null);
-            request.execute("teste");
+            //ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.TICKETS, null);
+            //request.execute("teste");
+            Intent ticketsActivity = new Intent(this, TicketsActivity.class);
+            startActivity(ticketsActivity);
         }
 
         return super.onOptionsItemSelected(item);
