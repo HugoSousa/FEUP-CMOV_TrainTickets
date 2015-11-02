@@ -3,4 +3,10 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Inspector login</string>
+    <string name="label_username">Employee email</string>
+    <string name="label_password">Password</string>
+    <string name="login">Login</string>
+    <string name="authentication_label">Authentication required</string>
+
 </resources>
