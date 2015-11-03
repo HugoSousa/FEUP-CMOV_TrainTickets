@@ -162,9 +162,115 @@ var simple_routes = [
 }
 ];
 /*-------------------------------------------------------------------------------------*/
+sumSoldTickets = function(userId, datetime, affect, callback){
+  connection.query('select * from ticket t join route r on t.route_id = r.id where user_id = ? and is_validated = (0);', [userId], function (err, rows, fields) {
+    if (!err){
+        cb(null, rows);
+      }
+      else{
+        console.log('Error while performing Query.');
+        cb(err,null);
+      }
+  });
+};
+
 
 exports.teste = function () {
   //checkTrainCapacity(1,4,null,2);
+  /*
+  getRoutePossibilites(1,6,'14:00:00', function(err, data){
+    async.each(data, function(ticket, cb){
+      console.log("TICKET: " + JSON.stringify(ticket));
+    });
+    //console.log(data);
+  });
+  */
+
+  //get small chunks of route for that big route and create array with those
+  //for each small chunk, get tickets of affected routes and sum on the array
+  //if some of the sum on the array exceeds the capacity train, ticket is sold_out!
+
+  //from, to, datetime initial, train
+  exports.checkTrainCapacity(1, 4, 1, function(err, data){
+    console.log(JSON.stringify(data));
+    console.log(data[0].route);
+    //create array with small chunks
+    var date = '2015-11-02';
+    var times = ['09:00:00', '10:00:00', '10:45:00', '11:45:00', '12:30:00'];
+    
+    route_chunks = [];
+    //console.log("DATA: " + data);
+    async.forEachOf(data, function(small_route, index1, callback1){
+      var capacity = 1;
+      var tickets_sum = 0;
+
+      var user_id = 1;
+      //datetime
+      var datetime = date + " " + times[index1];
+
+      //console.log("DATETIME: " + datetime);
+
+      //get the time it passes on each chunk of the routes
+      var tickets_sold = 0;
+      async.forEachOf(small_route.affected, function(affect, index2, callback2){
+
+        var start_station = affect.from;
+        var end_station = affect.to;
+
+        var datetime = date + " " + times[start_station - 1];
+        console.log("DATETIME: " + datetime + " / FROM: " + start_station + " / TO: " + end_station);
+
+        connection.query('select count(*) as tickets_sold from ticket t join route r on t.route_id = r.id where user_id = ? and is_validated = (0) and t.route_date = ? and r.start_station = ? and r.end_station = ?', [user_id, datetime, start_station, end_station], function (err2, rows2, fields2) {
+          if (!err2){
+            console.log("TICKETS SOLD:" + rows2[0]['tickets_sold']);
+            tickets_sold += rows2[0]['tickets_sold'];
+          }
+          else{
+            console.log('Error while performing Query.');
+          }
+          callback2();
+        });
+      }
+      , function (err) {
+        if(! err){
+          console.log("SMALL ROUTE: " + small_route);
+          if(tickets_sold < capacity){
+            route_chunks.push({route: small_route.route, sold_out: false});
+          }else{
+            route_chunks.push({route: small_route.route, sold_out: true});
+          }
+        }
+
+        callback1();
+      });
+    },
+    function (err) {
+      /*
+      if(! err){
+        if("SOLD_OUT: " + route_chunks[index1].sold_out);
+      }else{
+
+      }
+      */
+      var sold_out = false;
+      for(var i = 0; i < route_chunks.length; i++){
+        if(route_chunks[i].sold_out){
+          sold_out = true;
+          break;
+        }
+      }
+
+      console.log(sold_out);
+    });
+
+      //get the sum of the tickets of the affected_routes
+      
+
+
+    
+
+    
+  })
 }
 
 exports.getTrainTimesTest = function (from, to, cb){
@@ -244,7 +350,7 @@ exports.getTrainTimesTest = function (from, to, cb){
 }
 
 
-exports.getTrainTimes = function (from, to, cb) {
+exports.getTrainTimes = function (from, to, date, cb) {
 
   //TODO: check if the capacity is exceeded for each trip (return 'sold_out' boolean field)
 
@@ -273,23 +379,37 @@ exports.getTrainTimes = function (from, to, cb) {
             }
 
             //check sold_out for each trip
-            for(var i = 0; i < result.trips.length; i++){
-              /*
-              checkTrainCapacity(from, to, result.trips[i].times[0], result.trips[i].train, i, function(data){
-                //result.trips[i]['sold_out'] = data;
-              });    
-              */
+            async.forEachOf(result.trips, function(trip, index, callback){
+              var datetime = date + " " + trip.times[0];
 
-            }
-
-            cb(null, result);
+              checkRouteSoldOut(from, to, datetime, trip.stations, trip.times, trip.train, function(err, data){
+                if(!err){
+                  console.log("UPDATE SOLD OUT TO " + data);
+                  result.trips[index]['sold_out'] = data;
+                }
+                else{
+                  //console.log("DONT UPDATE SOLD OUT");
+                  //console.log(data);
+                  //result.trips['sold_out'] = data;
+                }
+                callback();
+              });
+            },
+            function(err){
+              if(!err){
+                console.log("returning here");
+                //result.trips[0]['sold_out'] = false;
+                cb(null, result);
+              }else{
+                cb(err,null);
+              }
+            });
+            //cb(null, result);
           }
 
           else{
             cb(err1, null);
           }
-          
-          //console.log(JSON.stringify(result));
         });       
       }
       else{
@@ -365,10 +485,129 @@ exports.getTrainTimes = function (from, to, cb) {
               }
             }
             
-            console.log(JSON.stringify(result));
+            async.forEachOf(result.trips, function(trip, index, callback){
+              connection.query('select train_id from route r join station_stop ss on ss.route_id = r.id where r.id = ? and ss.time = ?', [route_1, trip.times[0]], function (err1, rows1, fields1) {
+                if (!err1){
+                    console.log("INDEX: " + index);
+                    result.trips[index]['train_1'] = rows1[0]['train_id'];
+
+                    var central_index = -1;
+                    //get the index of the central station
+                    for(var i = 0; i < trip.stations.length; i++){
+                      if(trip.stations[i] == 3)
+                        central_index = i;
+                    }
+                    console.log("CENTRAL INDEX: " + central_index);
+                    //time when route leaves the central station
+                    var arrival_central = trip.times[central_index];
+                    var waiting_time = trip.waiting_time;
+                    var arrival_central_date = new Date(date + " " + arrival_central);
+                    var departure_central_date = new Date(arrival_central_date.getTime() + waiting_time*60000);
+                    var departure_central = departure_central_date.getHours() + ":" + departure_central_date.getMinutes() + ":" + departure_central_date.getSeconds();
+                    
+                    connection.query('select train_id from route r join station_stop ss on ss.route_id = r.id where r.id = ? and ss.time = ?', [route_2, departure_central], function (err2, rows2, fields2) {
+                      if (!err2){
+                        console.log("ROWS2 " + rows2[0]);
+                        result.trips[index]['train_2'] = rows2[0]['train_id'];
+                        callback();
+                      }
+                      else{
+                        console.log('Error while performing Query.');
+                      }
+                    });
+                    
+                  }
+                  else{
+                    console.log('Error while performing Query.');
+                  }
+              });
+            },
+            function(err, data){
+
+              //TODO NAO ESTA A ESCREVER SOLD_OUT NAS TRIPS TODAS....CALLBACK SHIT..?
+
+              async.forEachOf(result.trips, function(trip1, index1, callback1){
+              var datetime = date + " " + trip1.times[0];
+
+              checkRouteSoldOut(from, 3, datetime, trip1.stations, trip1.times, trip1.train_1, function(err, data){
+                if(!err){
+                  if(data == false){
+                    checkRouteSoldOut(3, to, datetime, trip1.stations, trip1.times, trip1.train_2, function(err1, data1){
+                      if(!err1){
+                        console.log("UPDATE SOLD OUT TO " + data1);
+                        result.trips[index1]['sold_out'] = data1;
+                        callback1();
+                      }
+                      else{         }
+                        //callback();
+                    });
+                  }else{
+                    result.trips[index1]['sold_out'] = true;
+                    callback1();
+                  }
+                  //callback1();
+                  //console.log("UPDATE SOLD OUT TO " + data);
+                  //result.trips[index]['sold_out'] = data;
+                }
+                else{
+                }
+                  //callback1();
+                });
+              },
+              function(err){
+                if(!err){
+                  console.log("returning here");
+                  //result.trips[0]['sold_out'] = false;
+                  cb(null, result);
+                }else{
+                  cb(err,null);
+                }
+              });
+            });
+
+            //console.log(JSON.stringify(result));
+            //for each trip, check if sold_out
+            //check from "from" to "central" and from "central" to "to"
+            
+            /*
+            async.forEachOf(result.trips, function(trip, index, callback){
+              var datetime = date + " " + trip.times[0];
+
+              checkRouteSoldOut(from, 3, datetime, trip.stations, trip.times, trip.train_1, function(err, data){
+                if(!err){
+                  if(data == false){
+                    checkRouteSoldOut(3, to, datetime, trip.stations, trip.times, trip.train_2, function(err1, data1){
+                      if(!err1){
+                        console.log("UPDATE SOLD OUT TO " + data1);
+                        result.trips[index]['sold_out'] = data1;
+                      }
+                      else{
+                      }
+                    });
+                  }else{
+                    result.trips[index]['sold_out'] = true;
+                  }
+                  //console.log("UPDATE SOLD OUT TO " + data);
+                  //result.trips[index]['sold_out'] = data;
+                }
+                else{
+                }
+                callback();
+              });
+            },
+            function(err){
+              if(!err){
+                console.log("returning here");
+                //result.trips[0]['sold_out'] = false;
+                cb(null, result);
+              }else{
+                cb(err,null);
+              }
+            });
+            */
 
             //check sold_out for each trip
-            cb(null, result);
+            //cb(null, result);
           }
           else{
             console.log('Error while performing Query.');
@@ -385,6 +624,95 @@ exports.getTrainTimes = function (from, to, cb) {
     }
   });
 
+}
+
+checkRouteSoldOut = function(from, to, datetime, stations, times, train, callback){
+
+  console.log(stations);
+  console.log(times);
+
+  exports.checkTrainCapacity(from, to, train, function(err, data){
+    console.log(JSON.stringify(data));
+    console.log(data[0].route);
+    //create array with small chunks
+    var date = '2015-11-02';
+    //var times = ['09:00:00', '10:00:00', '10:45:00', '11:45:00', '12:30:00'];
+    var capacity = data.capacity;
+    var route_chunks = [];
+    //console.log("DATA: " + data);
+    async.forEachOf(data, function(small_route, index1, callback1){
+      //var capacity = 1;
+      var tickets_sum = 0;
+
+      //datetime
+      //var datetime = date + " " + times[index1];
+
+      //console.log("DATETIME: " + datetime);
+
+      //get the time it passes on each chunk of the routes
+      var tickets_sold = 0;
+      async.forEachOf(small_route.affected, function(affect, index2, callback2){
+
+        var start_station = affect.from;
+        var end_station = affect.to;
+
+        var time;
+        for(var i = 0; i < stations.length; i++){
+          //console.log("stations[i] " + stations[i]);
+          //console.log("start_station " + start_station);
+
+          if(stations[i] == start_station){
+            //console.log("YES");
+            time = times[i];
+            break;
+          }
+        }
+
+        var datetime = date + " " + time;
+        console.log("DATETIME: " + datetime + " / FROM: " + start_station + " / TO: " + end_station);
+
+        connection.query('select count(*) as tickets_sold from ticket t join route r on t.route_id = r.id where is_validated = (0) and t.route_date = ? and r.start_station = ? and r.end_station = ?', [datetime, start_station, end_station], function (err2, rows2, fields2) {
+          if (!err2){
+            console.log("TICKETS SOLD:" + rows2[0]['tickets_sold']);
+            tickets_sold += rows2[0]['tickets_sold'];
+          }
+          else{
+            console.log('Error while performing Query.');
+          }
+          callback2();
+        });
+      }
+      , function (err) {
+        if(! err){
+          console.log("SMALL ROUTE: " + small_route.route + " / " + tickets_sold);
+          console.log("TRAIN " + train + " / CAPACITY " + capacity);
+          if(tickets_sold < capacity){
+            route_chunks.push({route: small_route.route, sold_out: false});
+          }else{
+            route_chunks.push({route: small_route.route, sold_out: true});
+          }
+        }
+
+        callback1();
+      });
+    },
+    function (err) {
+      if(!err){
+        var sold_out = false;
+        for(var i = 0; i < route_chunks.length; i++){
+          if(route_chunks[i].sold_out){
+            sold_out = true;
+            break;
+          }
+        }
+        console.log("ROUTE_CHUNKS " + JSON.stringify(route_chunks));
+        callback(null, sold_out);
+
+      }else{
+        callback(err, null);
+      }      
+    });
+  })
 }
 
 
@@ -425,7 +753,7 @@ getLessWaitingTime = function (central_station_times, last_time) {
   return index;
 }
 
-exports.checkTrainCapacity = function(from, to, datetime, train_id, index, cb){
+exports.checkTrainCapacity = function(from, to, train_id, cb){
 
   var capacity;
 
@@ -469,16 +797,17 @@ exports.checkTrainCapacity = function(from, to, datetime, train_id, index, cb){
                   affected_ticket_routes[l]["to"] = stations.indexOf(to_station_name);
                 }
 
-                affects.push({ route: affected_routes[j], affected: affected_ticket_routes });
+                affects.push({route: affected_routes[j], affected: affected_ticket_routes });
               }
             }
 
             break;
           }
         }
-
+        affects['capacity'] = capacity;
         console.log("AFFECTS: " + JSON.stringify(affects));
-
+        cb(null, affects);
+        /*
         for(var i = 0; i < affects.length; i++){
 
           //TODO: change user
@@ -517,7 +846,7 @@ exports.checkTrainCapacity = function(from, to, datetime, train_id, index, cb){
           });
 
         }
-
+        */
       }
       else{
         console.log("Error in query: ", err);
@@ -554,7 +883,7 @@ exports.getSimpleTrains = function(cb) {
   async.each(simpleTrains, function(train, callback) {
 
         exports.getTrainTimes(train.start_id, train.end_id, function(err, data){
-      if (err) {
+          if (err) {
               console.log("ERROR : ",err);            
           } else { 
               var trips = [];

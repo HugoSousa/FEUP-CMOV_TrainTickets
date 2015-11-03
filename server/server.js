@@ -115,7 +115,7 @@ app.get("/api/testemployee", [employeeauth], function (req, res) {
 router.route('/teste')
 	.get(function(req, res) {
 
-		//database.teste();
+		database.teste();
 		res.json({ result: {message:'Sucess' , tickets:[]} });
 })
 
@@ -177,6 +177,7 @@ router.route('/routes')
 		var from = req.query.from;
 		var to = req.query.to;
 		var date = req.query.date; //needed to check if tickets are sold_out
+		date = date.trim();
 		/*
 		database.teste(function(err, data){
 			if (err) {
@@ -188,45 +189,16 @@ router.route('/routes')
 	        }    
 		});*/
 
-		database.getTrainTimes(from, to, function(err, data){
+		database.getTrainTimes(from, to, date, function(err, data){
 			if (err) {
 	            // error handling code goes here
 	            console.log("ERROR : ",err);            
 	        } else {            
 	            // code to execute on data retrieval
 	            res.status(200);
-	            console.log("result from db is : ",data);   
+	            console.log("result from db is : ", data);   
 	            //res.json({ result: {message:'Sucess' , tickets:[]} });
-	            res.json(data);
-	            /*
-	            async.forEachOf(data.trips, function(value, key, callback){
-	            	database.checkTrainCapacity(from, to, value.times[0], value.train, key, function(data){
-
-						console.log("AAAAAA");
-	            		console.log(JSON.stringify(data));
-	            		//data.trips[key]['sold_out'] = data['result'];
-	            		
-	            	})
-	            	callback();
-            	},
-	            function(err){
-
-	            	res.json({ result: {message:'Sucess' , tickets:[]} });
-	            } 
-            	);
-				*/
-	            /*
-	            for(var i = 0; i < data.trips.length; i++){
-	              checkTrainCapacity(from, to, data.trips[i].times[0], data.trips[i].train, function(data){
-	                //result.trips[i]['sold_out'] = data;
-	                console.log("SAME SHIT");
-	              });    
-	              
-	              console.log("JA FOSTE");
-
-	            }*/
-
-	            
+	            res.json(data);         
 	        }    
 		});		
 })
