@@ -545,13 +545,11 @@ exports.getTrainTimes = function (from, to, date, cb) {
                     result.trips[index1]['sold_out'] = true;
                     callback1();
                   }
-                  //callback1();
                   //console.log("UPDATE SOLD OUT TO " + data);
                   //result.trips[index]['sold_out'] = data;
                 }
                 else{
                 }
-                  //callback1();
                 });
               },
               function(err){
@@ -882,7 +880,7 @@ exports.getSimpleTrains = function(cb) {
 
   async.each(simpleTrains, function(train, callback) {
 
-        exports.getTrainTimes(train.start_id, train.end_id, function(err, data){
+        exports.getTrainTimes(train.start_id, train.end_id, null, function(err, data){
           if (err) {
               console.log("ERROR : ",err);            
           } else { 
@@ -908,7 +906,7 @@ exports.getSimpleTrains = function(cb) {
 }
 
 function getRoutePossibilites(from, to, time, cb) {
-   exports.getTrainTimes(from, to, function(err, data){
+   exports.getTrainTimes(from, to, null, function(err, data){
       if (err) {
               cb(null,err);          
           } else { 

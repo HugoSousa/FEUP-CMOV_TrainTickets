@@ -1,16 +1,35 @@
 package feup.comv.inspectortrainticketingclient;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.Map;
+
+public class RoutesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_tickets);
+
+        ArrayList<Route> routes = new ArrayList<>();
+        //get downloaded routes from local storage and add to the listview
+        SharedPreferences sp = getSharedPreferences("routes", 0);
+        Map<String,?> keys = sp.getAll();
+
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+
+            Route t = Route.convertKeyToTicket(entry.getKey());
+            System.out.println("oi");
+            System.out.println(t.getKey());
+            routes.add(t);
+        }
     }
 
     @Override
@@ -33,5 +52,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void downloadTrip(View view){
+        Intent mainRoutesActivity = new Intent(this, MainRoutesActivity.class);
+        startActivity(mainRoutesActivity);
     }
 }

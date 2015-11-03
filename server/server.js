@@ -250,7 +250,7 @@ router.route('/downloadtickets')
 		           res.status(400).json({error: err});              
 		        } else {            
 		        	console.log(data);
-		            res.json(data);   
+		            res.json({tickets: data});   
 		        }    
 			});
 		}

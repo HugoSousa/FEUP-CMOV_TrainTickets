@@ -18,7 +18,17 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+
+        //if user is logged in, redirect to tickets
+        SharedPreferences sp = getSharedPreferences("login", 0);
+
+        if(sp.getString("token", null) != null){
+            Intent ticketsActivity = new Intent(this, RoutesActivity.class);
+            startActivity(ticketsActivity);
+            finish();
+        }else {
+            setContentView(R.layout.activity_login);
+        }
     }
 
     @Override
@@ -86,7 +96,7 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
                         e.printStackTrace();
                     }
 
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent = new Intent(this, RoutesActivity.class);
                     intent.putExtra("data", result.toString());
                     startActivity(intent);
 
