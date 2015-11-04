@@ -29,6 +29,12 @@
             android:label="@string/title_activity_pick_time"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
+        <activity android:name=".RouteActivity" >
+        </activity>
+        <activity android:name=".ScanActivity" >
+        </activity>
+        <activity android:name=".StatisticsActivity" >
+        </activity>
     </application>
 
 </manifest>

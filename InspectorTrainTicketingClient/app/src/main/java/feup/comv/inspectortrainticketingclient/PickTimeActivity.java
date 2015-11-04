@@ -25,6 +25,7 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
     private boolean dateSelected = false;
     private String fromStation, toStation;
     private String date, time;
+    private String fromStationString, toStationString;
 
 
     @Override
@@ -40,6 +41,8 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
             JSONObject trainJson = new JSONObject(train);
             fromStation = trainJson.getString("start_id");
             toStation = trainJson.getString("end_id");
+            fromStationString = trainJson.getString("start");
+            toStationString = trainJson.getString("end");
 
             JSONArray trips = trainJson.getJSONArray("trips");
             for (int i = 0; i < trips.length(); i++) {
@@ -112,10 +115,6 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
         String url = "downloadtickets?from=" + fromStation + "&to=" + toStation + "&date=" + date + "&time=" + time;
         request.execute(url);
 
-
-        Intent mainRoutesActivity = new Intent(this, RoutesActivity.class);
-        startActivity(mainRoutesActivity);
-        finish();
     }
 
     private void updateDownloadButton() {
@@ -144,8 +143,12 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
                     e.printStackTrace();
                 }
 
-                editor.putStringSet(new Route(Integer.parseInt(fromStation), Integer.parseInt(toStation), date, time).getKey(), ticketSet);
+                editor.putStringSet(new Route(Integer.parseInt(fromStation), Integer.parseInt(toStation), fromStationString, toStationString, date, time).getKey(), ticketSet);
                 editor.commit();
+
+                Intent routesActivity = new Intent(this, RoutesActivity.class);
+                startActivity(routesActivity);
+                finish();
             }
         }
     }
