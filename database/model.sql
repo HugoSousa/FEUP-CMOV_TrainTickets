@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: trainsystem
 -- ------------------------------------------------------
--- Server version 5.6.17
+-- Server version	5.6.27-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -43,6 +43,11 @@ CREATE TABLE `employee` (
   `idemployee` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(45) NOT NULL,
   `password` varchar(45) NOT NULL,
+  `uploaded_routes` int(11) NOT NULL DEFAULT '0',
+  `uploaded_tickets` int(11) NOT NULL DEFAULT '0',
+  `validated_tickets` int(11) NOT NULL DEFAULT '0',
+  `fraudulent_tickets` int(11) NOT NULL DEFAULT '0',
+  `no_shows` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`idemployee`),
   UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
@@ -137,7 +142,7 @@ CREATE TABLE `ticket` (
   KEY `fk_ticket_user_idx` (`user_id`),
   CONSTRAINT `fk_ticket_route` FOREIGN KEY (`route_id`) REFERENCES `route` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ticket_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,4 +187,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-29 16:46:44
+-- Dump completed on 2015-11-04 14:57:06

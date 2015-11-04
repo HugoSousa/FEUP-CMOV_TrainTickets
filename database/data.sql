@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: trainsystem
 -- ------------------------------------------------------
--- Server version	5.6.17
+-- Server version	5.6.27-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -31,6 +31,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
+INSERT INTO `employee` VALUES (1,'hugo@gmail.com','hugo',0,0,0,0,0);
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -70,7 +71,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `ticket` WRITE;
 /*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
-INSERT INTO `ticket` VALUES (5,15,1,'\0','2015-10-29 14:00:00','\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0','\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0'),(6,15,1,'\0','2015-10-29 14:00:00','4ce006ed-13db-45','m)%Ø£³t™ý\n=ãeJ19P,\0ÌDƒmkéàÎ¼\'u¨¯úë5‡,ÒõÕ'),(7,7,1,'\0','2015-10-29 14:00:00','98247ad0-aba4-41','eÐ­>Ÿ*øÍƒEYèS7@é÷({éÈ\"è4•O±õývR‘ê–‹æŠ©/ÁÐîË'),(8,2,1,'\0','2015-10-29 19:00:00','f745c53d-64b2-45','qK3H{¨AÚôßX ¨„lo¢e0QCKÖ©þdvh‹eÉ\Zô3kš3ñ%z–');
+INSERT INTO `ticket` VALUES (6,15,1,'\0','2015-10-29 14:00:00','4ce006ed-13db-45','m)%Ø£³t™ý\n=ãeJ19P,\0ÌDƒmkéàÎ�'),(7,7,1,'\0','2015-10-29 14:00:00','98247ad0-aba4-41','eÐ­>Ÿ*øÍƒEYèS7@é÷({éÈ\"è4•O±õ'),(8,2,1,'\0','2015-10-29 19:00:00','f745c53d-64b2-45','qK3H{¨AÚôßX ¨„lo¢e0QCKÖ©þdvh‹'),(9,7,1,'\0','2015-11-02 09:00:00','?\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0','?\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0');
 /*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -103,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-29 16:46:52
+-- Dump completed on 2015-11-04 14:57:26
