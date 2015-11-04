@@ -967,9 +967,9 @@ exports.getAllTickets = function(from,to,time,date,cb) {
                           console.log(date + ' ' + combo.time);
                           console.log(rows);
                           for (var i = 0; i < rows.length; i++) {
-                            rows[i].uuid = Array.prototype.slice.call(rows[i].uuid, 0);
+                            //rows[i].uuid = Array.prototype.slice.call(rows[i].uuid, 0);
                             rows[i].is_validated = Array.prototype.slice.call(rows[i].is_validated, 0);
-                            rows[i].signature = Array.prototype.slice.call(rows[i].signature, 0);
+                            //rows[i].signature = Array.prototype.slice.call(rows[i].signature, 0);
                             rows[i].switch_central = Array.prototype.slice.call(rows[i].switch_central, 0);
 
 
@@ -1184,7 +1184,6 @@ exports.getEmployeeByEmail = function (email, cb) {
       }
   });
 }
-
 exports.buyTickets = function (user, from, to, date, time, cb){
 
   //TODO validate the credit card of the user, using the fake external service!
@@ -1200,9 +1199,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
 
           var route_1 = data['route_1'];
           var code = uuid.v4();
-          var obj = {code: code, route: route_1, user: user, date: datetime};
-          var signature = key.sign(JSON.stringify(obj));
-          connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature], function (err1, result1) {
+          var obj = code + " " + route_1 + " " + user + " " + datetime;
+          var signature = key.sign(obj);
+
+          connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature.toString('base64')], function (err1, result1) {
             if (!err1){
                 cb(null, {message: "Successfully inserted ticket " + result1.insertId });
             }
@@ -1222,9 +1222,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
             if(err){ cb({error: "Trnsaction error"}, null); }
 
             var code = uuid.v4();
-            var obj = {code: code, route: route_1, user: user, date: datetime};
-            var signature = key.sign(JSON.stringify(obj));
-            connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature], function(err1, result1){
+            var obj = code + " " + route_1 + " " + user + " " + datetime;
+            var signature = key.sign(obj);
+
+            connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature.toString('base64')], function(err1, result1){
               if(err1){
                 connection.rollback(function() {
                   cb(err1, null);
@@ -1233,9 +1234,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
                 var time2 = data['ticket_2'][0]['time'];
                 var datetime2 = date + " " + time2;
                 var code = uuid.v4();
-                var obj = {code: code, route: route_2, user: user, date: datetime2};
-                var signature = key.sign(JSON.stringify(obj));
-                connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_2, user, datetime2, code, signature],function(err2, result2){
+
+                var obj = code + " " + route_2 + " " + user + " " + datetime2;
+                var signature = key.sign(obj);
+                connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_2, user, datetime2, code, signature.toString('base64')],function(err2, result2){
                   if(err2){
                     connection.rollback(function() {
                       cb(err2, null);

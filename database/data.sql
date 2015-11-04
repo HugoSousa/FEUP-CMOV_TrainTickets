@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: trainsystem
 -- ------------------------------------------------------
--- Server version	5.6.27-log
+-- Server version	5.6.17
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -71,7 +71,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `ticket` WRITE;
 /*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
--- INSERT INTO `ticket` VALUES (6,15,1,'\0','2015-10-29 14:00:00','4ce006ed-13db-45','m)%Ø£³t™ý\n=ãeJ19P,\0ÌDƒmkéàÎ�'),(7,7,1,'\0','2015-10-29 14:00:00','98247ad0-aba4-41','eÐ­>Ÿ*øÍƒEYèS7@é÷({éÈ\"è4•O±õ'),(8,2,1,'\0','2015-10-29 19:00:00','f745c53d-64b2-45','qK3H{¨AÚôßX ¨„lo¢e0QCKÖ©þdvh‹'),(9,7,1,'\0','2015-11-02 09:00:00','?\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0','?\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0');
+INSERT INTO `ticket` VALUES (23,15,1,'\0','2015-11-04 09:00:00','58b0d531-e344-41bf-9554-6306f9a75405','ZtrDlNUGprZnW2IHafZFUS6C3IP07A4MEE/Dzn7ssFCkfj');
 /*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-11-04 14:57:26
+-- Dump completed on 2015-11-04 20:48:07
