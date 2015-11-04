@@ -26,8 +26,6 @@ var verification = key.verify(text,signature);
 console.log('result: ', verification)
 */
 
-;
-
 
 // configure app
 app.use(morgan('dev')); // log requests to the console
@@ -178,16 +176,6 @@ router.route('/routes')
 		var to = req.query.to;
 		var date = req.query.date; //needed to check if tickets are sold_out
 		date = date.trim();
-		/*
-		database.teste(function(err, data){
-			if (err) {
-	            // error handling code goes here
-	            console.log("ERROR : ",err);            
-	        } else {            
-	            // code to execute on data retrieval
-	            console.log("result from db is : ",data);   
-	        }    
-		});*/
 
 		database.getTrainTimes(from, to, date, function(err, data){
 			if (err) {
@@ -257,30 +245,48 @@ router.route('/downloadtickets')
 		
 })
 
+router.route('/statistics')
+	.get([employeeauth], function(req, res) {
+		var employee = req.user.idemployee;
+		
+		database.getStatistics(employee, function(err, data){
+			if (err) {
+	           res.status(400).json({error: err});              
+	        } else {            
+	        	console.log(data);
+	            res.json(data);   
+	        }  
+		});
+});
 
-/*
-	Employee app workflow:
-	/api/simpletrains
-	screen 1 -> screen 2
-*/
+router.route('/statistics/upload')
+	.post([employeeauth], function(req, res) {
+		var employee = req.user.idemployee;
+		
+		var uploaded_routes = req.body.uploaded_routes;
+		var uploaded_tickets = req.body.uploaded_tickets;
+		var validated_tickets = req.body.validated_tickets;
+		var fraudulent_tickets = req.body.fraudulent_tickets;
+		var no_shows = req.body.no_shows;
 
-// TRAIN ROUTING
-// =============================================================================	
-
-router.route('/schedule')
-.get(function(req, res) {
-	// TODO check if req has station 1 and 2 data
-	res.json({ result: {message:'Sucess' , data:[]} });
-})
-
-
-//may not be needed, /schedule can send all the info?
-
-router.route('/schedule/detail')
-.get(function(req, res) {
-	// TODO check if req has station 1 and 2 data
-	res.json({ result: {message:'Sucess' , data:[]} });
-})
+		
+		if (uploaded_routes == undefined || !uploaded_routes  || uploaded_routes == "" ||
+			uploaded_tickets == undefined || !uploaded_tickets  || uploaded_tickets == "" ||
+			validated_tickets == undefined || !validated_tickets  || validated_tickets == "" ||
+			fraudulent_tickets == undefined || !fraudulent_tickets  || fraudulent_tickets == "" ||
+			no_shows == undefined || !no_shows  || no_shows == "") res.status(400).json({error: 'Missing request parameters'});
+		else{
+			database.updateStatistics(employee, req.body, function(err, data){
+				if(err){
+					res.status(400);
+					res.json({error: err});
+				}else{
+					res.json(data);
+				}
+			});
+		}
+		
+});
 
 // OPERATIONAL ROUTING
 // =============================================================================	
@@ -304,6 +310,22 @@ router.route('/tickets/purchase')
 		});
 })
 
+router.route('/tickets/upload')
+	.post([employeeauth], function(req, res){
+		//var employee_id = req.user.id;
+		var tickets = req.body.tickets;
+
+		console.log(employee_id);
+		//for each ticket, if validated = 1, update DB
+		database.uploadTickets(tickets, function(err, data){
+			if(err){
+				res.status(400);
+				res.json({error: err});
+			}else{
+				res.status(200).json(data);
+			}
+		});
+})
 
 router.route('/tickets/validate')
 	.post(function(req, res) {

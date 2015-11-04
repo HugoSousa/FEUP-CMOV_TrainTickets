@@ -5,5 +5,5 @@
     <item android:id="@+id/action_statistics"
         android:title="@string/action_statistics"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

@@ -1268,3 +1268,60 @@ exports.buyTickets = function (user, from, to, date, time, cb){
   })
 
 }
+
+exports.uploadTickets = function(tickets, cb){
+
+  async.each(tickets, function(ticket, callback){
+      
+      if(ticket['is_validated'][0] == 1){
+          console.log("update ticket");
+          connection.query('update ticket set is_validated = (1) where route_id = ? and user_id = ? and route_date = ?', [ticket['route_id'], ticket['user_id'], ticket['route_date']], function (err, rows, fields) {
+            if (!err){
+                callback();
+              }
+              else{
+                console.log('Error while performing Query.');
+              }
+          });
+      }else{
+        callback();
+      }
+  },function(err){
+    if(!err){
+      cb(null, {message: 'Upload successful'});
+    }else{
+      cb(err, null);
+    }
+  });
+}
+
+exports.getStatistics = function(employee, cb){
+  connection.query('select uploaded_routes, uploaded_tickets, validated_tickets, fraudulent_tickets, no_shows from employee where idemployee = ?', [employee], function (err, rows, fields) {
+    if (!err){
+        cb(null, rows[0]);
+      }
+      else{
+        console.log('Error while performing Query.');
+        cb(err, null);
+      }
+  });
+}
+
+exports.updateStatistics = function(employee, body, cb){
+
+  var uploaded_routes = parseInt(body.uploaded_routes);
+  var uploaded_tickets = parseInt(body.uploaded_tickets);
+  var validated_tickets = parseInt(body.validated_tickets);
+  var fraudulent_tickets = parseInt(body.fraudulent_tickets);
+  var no_shows = parseInt(body.no_shows);
+
+  connection.query('update employee set uploaded_routes = uploaded_routes + ?, uploaded_tickets = uploaded_tickets + ?, validated_tickets = validated_tickets + ?, fraudulent_tickets = fraudulent_tickets + ?, no_shows = no_shows + ? where idemployee = ?', [uploaded_routes, uploaded_tickets, validated_tickets, fraudulent_tickets, no_shows, employee], function (err, rows, fields) {
+    if (!err){
+        cb(null, {message: 'Update successful'});
+      }
+      else{
+        console.log('Error while performing Query.');
+        cb(err, null);
+      }
+  });
+}

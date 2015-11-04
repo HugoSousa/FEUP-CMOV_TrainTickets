@@ -70,6 +70,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/upload"
-        android:layout_above="@id/scan_btn"/>
+        android:id="@+id/upload_btn"
+        android:layout_above="@id/scan_btn"
+        android:onClick="uploadTrip"/>
 
 </RelativeLayout>

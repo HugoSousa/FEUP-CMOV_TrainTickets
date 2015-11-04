@@ -13,13 +13,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/action_statistics"
-            android:onClick="showStatistics"/>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="@string/download_trip"
+            android:id="@+id/btn_download_trip"
             android:onClick="downloadTrip"/>
 
         <ListView

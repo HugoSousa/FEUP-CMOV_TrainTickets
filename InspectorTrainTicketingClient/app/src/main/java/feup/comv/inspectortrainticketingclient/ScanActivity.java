@@ -1,6 +1,7 @@
 package feup.comv.inspectortrainticketingclient;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -55,6 +56,20 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
 
     @Override
     public void handleResult(Result result) {
+        //validate result
+        //TODO update statistics in shared preferences
+        /*
+        SharedPreferences sp = getSharedPreferences("statistics", 0);
 
+        int uploadedTickets = sp.getInt("uploaded_tickets", 0);
+        int validatedTickets = sp.getInt("validated_tickets", 0);
+        int fraudulentTickets = sp.getInt("fraudulent_tickets", 0);
+        int noShows = sp.getInt("no_shows", 0);
+
+        SharedPreferences.Editor editor = sp.edit();
+
+        //add validated_ticket or fraudulent_ticket
+        editor.putInt("validated_tickets", validatedTickets + 1);
+        */
     }
 }

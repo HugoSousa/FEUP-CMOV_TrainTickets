@@ -29,11 +29,12 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
     //private final String API_URL = "http://192.168.1.65:8080/api/";
 
     public enum requestCode {
-        ROUTE,
-        PING,
         LOGIN_EMPLOYEE,
         TRIPS,
-        DOWNLOAD_TICKET
+        DOWNLOAD_TICKET,
+        UPLOAD,
+        UPDATE_STATISTICS,
+        STATISTICS
     }
     private requestCode requestCode;
     private String token;
