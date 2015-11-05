@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: trainsystem
 -- ------------------------------------------------------
--- Server version	5.6.17
+-- Server version	5.6.27-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -71,7 +71,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `ticket` WRITE;
 /*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
-INSERT INTO `ticket` VALUES (23,15,1,'\0','2015-11-04 09:00:00','58b0d531-e344-41bf-9554-6306f9a75405','ZtrDlNUGprZnW2IHafZFUS6C3IP07A4MEE/Dzn7ssFCkfj');
+INSERT INTO `ticket` VALUES (24,15,1,'\0','2015-11-05 09:00:00','01f36a83-4519-46f6-920a-907ef2fbb3b3','WoJzY+lbVmtleO0LJrme0PpZUWwJVjBZd9lySddj4KXyo+Ugb6LGUpjIyk6gtQ=='),(25,15,1,'\0','2015-11-05 18:30:00','f0fb5bd0-757f-406c-8c78-ce2cc6dbbe87','WVxnT/j+EfmLWku1Zfg6SzBEsiAPNU5hDklaA6y0xyBFjo466OqFUFLERis8lA=='),(26,15,1,'\0','2015-11-05 09:00:00','756ce40c-a85b-415c-bc70-12d1f5e6a112','TtDEl/YJiwm1ToKJpkZmGVP2taTJU2z4SqW+AYWbvUYmfx0fbEdD/WANdy/3dw==');
 /*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-11-04 20:48:07
+-- Dump completed on 2015-11-05 10:40:25
