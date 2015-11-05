@@ -633,7 +633,7 @@ checkRouteSoldOut = function(from, to, datetime, stations, times, train, callbac
     console.log(JSON.stringify(data));
     console.log(data[0].route);
     //create array with small chunks
-    var date = '2015-11-02';
+    var date = datetime.split(" ")[0];
     //var times = ['09:00:00', '10:00:00', '10:45:00', '11:45:00', '12:30:00'];
     var capacity = data.capacity;
     var route_chunks = [];
@@ -1201,7 +1201,7 @@ exports.buyTickets = function (user, from, to, date, time, cb){
           var code = uuid.v4();
           var obj = code + " " + route_1 + " " + user + " " + datetime;
           var signature = key.sign(obj);
-
+          
           connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature.toString('base64')], function (err1, result1) {
             if (!err1){
                 cb(null, {message: "Successfully inserted ticket " + result1.insertId });
