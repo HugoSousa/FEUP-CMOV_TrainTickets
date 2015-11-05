@@ -39,6 +39,7 @@ public class RoutesListActivity extends AppCompatActivity {
             for(int i = 0; i < ja.length(); i++){
                 JSONObject trip = (JSONObject)ja.get(i);
 
+                boolean soldOut = trip.getBoolean("sold_out");
                 JSONArray stationsJSON = (JSONArray) trip.get("stations");
                 JSONArray timesJSON = (JSONArray) trip.get("times");
                 ArrayList<Integer> stations = new ArrayList<Integer>();
@@ -59,9 +60,9 @@ public class RoutesListActivity extends AppCompatActivity {
                 Route r;
                 if(switch_central){
                     int waitingTime = trip.getInt("waiting_time");
-                    r = new Route(stations, times, -1, -1, waitingTime);
+                    r = new Route(stations, times, -1, soldOut,  -1, waitingTime);
                 }else{
-                    r = new Route(stations, times, -1);
+                    r = new Route(stations, times, -1, soldOut);
                 }
                 routes.add(r);
             }

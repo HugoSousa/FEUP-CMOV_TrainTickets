@@ -92,13 +92,13 @@ public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRe
 
                 System.out.println("2 tickets");
 
-                route = new Route(stations, times, train1, train2, 0); //calcular waiting time
+                route = new Route(stations, times, train1, false, train2, 0); //calcular waiting time
             }
             catch(JSONException e){
                 //it's not a complex route
                 System.out.println("Only 1 ticket");
 
-                route = new Route(stations, times, train1);
+                route = new Route(stations, times, train1, false);
             }
         } catch (JSONException e) {
             e.printStackTrace();

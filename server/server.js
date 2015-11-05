@@ -68,8 +68,10 @@ router.route('/register')
 		if (new_user.validate()) {
 			database.registeruser(new_user, function (err, result) {
 
-				if (err || result == null) 
+				if (err || result == null){ 
+					console.log(err);
 					res.status(400).json({result: {error: 'Duplicate username or creditcard id' }})
+				}
 				else
 					res.json({ result: {message: 'Sucess'} })
 			})

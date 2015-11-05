@@ -30,6 +30,7 @@
     <string name="text_offline_not_logged_in">You\'re in offline mode and you aren\'t logged in.\n\nGo online for full functionality of the app. </string>
     <string name="warning_local_storage">Be careful!\n If you remove a ticket from local storage in offline mode, you can\'t have back until you\'re connected to a network again. </string>
     <string name="local_storage">Local Storage</string>
+    <string name="sold_out">Sold Out</string>
 
     <string-array name="credit_card_types">
         <item>VISA</item>

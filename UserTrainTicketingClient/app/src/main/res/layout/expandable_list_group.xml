@@ -6,7 +6,7 @@
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
-        android:layout_marginLeft="50dp"
+        android:layout_marginLeft="40dp"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="fill_parent">
@@ -28,9 +28,18 @@
     </LinearLayout>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="70sp"
         android:layout_height="wrap_content"
         android:text="@string/buy"
         android:id="@+id/buy_button"/>
+
+    <Button
+        android:layout_width="70sp"
+        android:layout_height="wrap_content"
+        android:text="@string/sold_out"
+        android:id="@+id/sold_out_button"
+        android:enabled="false"
+        android:textColor="@color/red"
+        android:visibility="gone" />
 
 </LinearLayout>

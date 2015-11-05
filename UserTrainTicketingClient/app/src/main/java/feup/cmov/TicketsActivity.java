@@ -118,6 +118,7 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
         /*
         tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
         tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
@@ -184,8 +185,9 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
         for(int i=0; i<adapter.getCount();i++){
             Ticket t = adapter.getItem(i);
 
-            View row = listTickets.getChildAt(i);
-            ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
+            //View row = listTickets.getChildAt(i);
+            //ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
+            //t.savedLocal = true;
 
             SharedPreferences sp = getSharedPreferences("tickets", 0);
             SharedPreferences.Editor editor = sp.edit();
@@ -194,9 +196,10 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                 editor.putString(t.code, t.toJSON().toString());
                 editor.commit();
 
-                symbol.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp);
+                //symbol.setImageResource(R.drawable.ic_remove_circle_outline_black_24dp);
             }
         }
+        adapter.notifyDataSetChanged();
     }
 
     public void removeAllLocal(View view){
@@ -205,8 +208,8 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
         for(int i=0; i<adapter.getCount();i++){
             Ticket t = adapter.getItem(i);
 
-            View row = listTickets.getChildAt(i);
-            ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
+            //View row = listTickets.getChildAt(i);
+            //ImageButton symbol = (ImageButton)row.findViewById(R.id.symbol);
 
             SharedPreferences sp = getSharedPreferences("tickets", 0);
             SharedPreferences.Editor editor = sp.edit();
@@ -215,8 +218,9 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                 editor.putString(t.code, null);
                 editor.commit();
 
-                symbol.setImageResource(R.drawable.ic_add_black_24dp);
+                //symbol.setImageResource(R.drawable.ic_add_black_24dp);
             }
+            adapter.notifyDataSetChanged();
         }
     }
 

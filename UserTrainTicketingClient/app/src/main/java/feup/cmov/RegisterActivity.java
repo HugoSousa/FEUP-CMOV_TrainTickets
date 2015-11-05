@@ -116,7 +116,6 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
 
     public void register(View view){
         EditText nameTV = (EditText)findViewById(R.id.register_name_input);
-        EditText idTV = (EditText)findViewById(R.id.register_id_input);
         Spinner spinnerCCType = (Spinner)findViewById(R.id.spinner_cc_type);
         EditText ccNumberTV = (EditText)findViewById(R.id.register_cc_number);
         EditText ccValidityTV = (EditText)findViewById(R.id.register_cc_validity);
@@ -125,7 +124,6 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
         EditText passwordConfirmTV = (EditText)findViewById(R.id.register_confirm_password);
 
         String name = nameTV.getText().toString().trim();
-        String idNumber = idTV.getText().toString().trim();
         String ccType = spinnerCCType.getSelectedItem().toString().trim();
         String ccNumber = ccNumberTV.getText().toString().trim().replaceAll("\\s","");
         String ccValidity = ccValidityTV.getText().toString().trim();
@@ -137,10 +135,6 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
 
         if(name.isEmpty()){
             nameTV.setError("Missing Value");
-            missing = true;
-        }
-        if(idNumber.isEmpty()) {
-            idTV.setError("Missing Value");
             missing = true;
         }
         if(ccNumber.isEmpty()) {
@@ -174,11 +168,20 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
             }else if(ccNumber.length() < 15 || ccNumber.length() > 19){
                 ccNumberTV.setText("Invalid credit card number. Should have between 15 and 19 digits.");
             }else{
-                //send register request to server
-                //ApiRequest request = new ApiRequest(this, LoginActivity.class, null, ApiRequest.POST, null);
                 ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.REGISTER, null);
-                request.execute("register", "");
-                finish();
+                JSONObject bodyObj = new JSONObject();
+                try {
+                    bodyObj.put("name", name);
+                    bodyObj.put("username", username);
+                    bodyObj.put("password", password);
+                    bodyObj.put("creditcard_type", ccType);
+                    bodyObj.put("creditcard_number", ccNumber);
+                    bodyObj.put("creditcard_validity", ccValidity);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                request.execute("register", bodyObj.toString());
             }
         }
     }
@@ -195,6 +198,7 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
                     //successful register
                     Intent loginIntent = new Intent(this, LoginActivity.class);
                     startActivity(loginIntent);
+                    finish();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

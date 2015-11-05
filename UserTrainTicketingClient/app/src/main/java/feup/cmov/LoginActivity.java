@@ -112,4 +112,9 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
             Toast.makeText(this, "Can't retrieve your search. Please check if you you're connected to Internet.", Toast.LENGTH_LONG).show();
         }
     }
+
+    public void redirectRegister(View view){
+        Intent registerActivity = new Intent(this, RegisterActivity.class);
+        startActivity(registerActivity);
+    }
 }

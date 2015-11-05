@@ -3,6 +3,8 @@ package feup.cmov;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,8 @@ import java.util.ArrayList;
 public class ExpandableListViewAdapter extends BaseExpandableListAdapter implements OnApiRequestCompleted{
 
     private static final class ViewHolder {
-        TextView textLabel;
+        TextView textLabel1;
+        TextView textLabel2;
     }
 
     private final ArrayList<Route> itemList;
@@ -74,7 +77,7 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
         if (resultView == null) {
             resultView = inflater.inflate(R.layout.expandable_list_row, null); //TODO change layout id
             holder = new ViewHolder();
-            holder.textLabel = (TextView) resultView.findViewById(R.id.grp_child); //TODO change view id
+            holder.textLabel1 = (TextView) resultView.findViewById(R.id.grp_child); //TODO change view id
             resultView.setTag(holder);
         } else {
             holder = (ViewHolder) resultView.getTag();
@@ -82,38 +85,15 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
 
         final StationTime item = getChild(groupPosition, childPosition);
 
-        /*
-        if(childPosition > 1){
-            if(getStationName(getChild(groupPosition, childPosition - 1).station.toString()).toUpperCase().equals("CENTRAL") && getGroup(groupPosition).waitingTime != -1){
-                int minutes = getGroup(groupPosition).waitingTime;
-                int hours = minutes / 60;
-                minutes = minutes % 60;
-                DecimalFormat df = new DecimalFormat("00");
-
-                //holder.textLabel.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
-
-                //add a row with waiting time before
-                //add a new child next position
-                //addChild(childPosition - 1);
-                holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
-
-            }else{
-                holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
-            }
-        }
-        else {
-            holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
-        }
-        */
         if(item.station == null){
             int minutes = getGroup(groupPosition).waitingTime;
             int hours = minutes / 60;
             minutes = minutes % 60;
             DecimalFormat df = new DecimalFormat("00");
 
-            holder.textLabel.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
+            holder.textLabel1.setText("Waiting Time [ " + df.format(hours) + ":" + df.format(minutes) + " ]");
         }else{
-            holder.textLabel.setText(getStationName(item.station.toString()) + " - " + item.time);
+            holder.textLabel1.setText(getStationName(item.station.toString()) + " - " + item.time);
         }
 
         return resultView;
@@ -138,15 +118,22 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
     public View getGroupView(int groupPosition, boolean isExpanded, View theConvertView, ViewGroup parent) {
         View resultView = theConvertView;
         ViewHolder holder1;
-        ViewHolder holder2;
+        //ViewHolder holder2;
 
         if (resultView == null) {
             resultView = inflater.inflate(R.layout.expandable_list_group, null); //TODO change layout id
             holder1 = new ViewHolder();
-            holder1.textLabel = (TextView) resultView.findViewById(R.id.label_route_from_to); //TODO change view id
-            holder2 = new ViewHolder();
-            holder2.textLabel = (TextView) resultView.findViewById(R.id.label_route_times); //TODO change view id
+            holder1.textLabel1 = (TextView) resultView.findViewById(R.id.label_route_from_to); //TODO change view id
+            //holder2 = new ViewHolder();
+            //holder2.textLabel = (TextView) resultView.findViewById(R.id.label_route_times); //TODO change view id
+            holder1.textLabel2 = (TextView) resultView.findViewById(R.id.label_route_times);
             Button buyButton = (Button) resultView.findViewById(R.id.buy_button);
+            if(itemList.get(groupPosition).soldOut){
+                Button soldOutButton = (Button) resultView.findViewById(R.id.sold_out_button);
+                soldOutButton.setVisibility(View.VISIBLE);
+                soldOutButton.setFocusable(false);
+                buyButton.setVisibility(View.GONE);
+            }
             buyButton.setFocusable(false);
 
             buyButton.setOnClickListener(new Button.OnClickListener() {
@@ -195,28 +182,30 @@ public class ExpandableListViewAdapter extends BaseExpandableListAdapter impleme
 
 
             resultView.setTag(holder1);
-            resultView.setTag(holder2);
+            //resultView.setTag(holder2);
         } else {
             holder1 = (ViewHolder) resultView.getTag();
-            holder2 = (ViewHolder) resultView.getTag();
+            //holder2 = (ViewHolder) resultView.getTag();
         }
 
         final Route item = getGroup(groupPosition);
 
         //holder.textLabel.setText(item.toString());
         //holder1.textLabel.setText("FROM " + getStationName(item.stationTimes.get(0).station.toString()) + " TO " + getStationName(item.stationTimes.get(item.stationTimes.size() - 1).station.toString()));
-        holder1.textLabel.setText("[ " + item.stationTimes.get(0).time + " - " + item.stationTimes.get(item.stationTimes.size() - 1).time + " ]");
+        holder1.textLabel1.setText("[ " + item.stationTimes.get(0).time + " - " + item.stationTimes.get(item.stationTimes.size() - 1).time + " ]");
         if(item.waitingTime != -1) {
             int minutes = item.waitingTime;
             int hours = minutes / 60;
             minutes = minutes % 60;
             DecimalFormat df = new DecimalFormat("00");
 
-            holder2.textLabel.setText("Waiting Time: " + df.format(hours) + ":" + df.format(minutes));
+            //holder2.textLabel.setText("Waiting Time: " + df.format(hours) + ":" + df.format(minutes));
+            holder1.textLabel2.setText("Waiting Time: " + df.format(hours) + ":" + df.format(minutes));
         }
         else{
-            holder1.textLabel.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-            holder2.textLabel.setVisibility(View.GONE);
+            holder1.textLabel1.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            //holder2.textLabel.setVisibility(View.GONE);
+            holder1.textLabel2.setVisibility(View.GONE);
         }
 
         return resultView;

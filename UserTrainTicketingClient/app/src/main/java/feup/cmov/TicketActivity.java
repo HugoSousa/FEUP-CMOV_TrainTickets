@@ -32,9 +32,9 @@ public class TicketActivity extends AppCompatActivity {
         JSONObject dataObj = new JSONObject();
         try {
             dataObj.put("code", code);
-            dataObj.put("route", route);
-            dataObj.put("user", user);
-            dataObj.put("date", date);
+            //dataObj.put("route", route);
+            //dataObj.put("user", user);
+            //dataObj.put("date", date);
         } catch (JSONException e) {
             e.printStackTrace();
         }

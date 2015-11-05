@@ -17,7 +17,8 @@ User.prototype.creditcard_number = {}
 User.prototype.creditcard_validity = {}
 
 
-User.prototype.validate = function () {  
+User.prototype.validate = function () {
+    console.log(this.data);  
 	if ('name' in this.data && 'username' in this.data && 'password' in this.data && 'creditcard_type' in this.data && 'creditcard_number' in this.data && 'creditcard_validity' in this.data) {
 		this.name = this.data.name;
 		this.username = this.data.username;
@@ -26,10 +27,12 @@ User.prototype.validate = function () {
 		this.creditcard_number = this.data.creditcard_number;
 		this.creditcard_validity = this.data.creditcard_validity;
 
-        var d = moment(new Date(this.data.creditcard_validity));
+        var dateSplit = this.data.creditcard_validity.split("/");
+        var date = new Date(dateSplit[1], dateSplit[0]-1, 1);
+        var d = moment(date);
+        console.log(d.isValid());
         if(d == null || !d.isValid()) return false;
         if(moment().diff(d,'months', true) >= 1) return false;
-
 		return true;
 	}
 	return false;

@@ -1123,8 +1123,10 @@ exports.registeruser = function (user, cb) {
 connection.beginTransaction(function(err) {
   if (err) cb(err,null);
   else {
+    var ccdateSplit = user.creditcard_validity.split("/");
+    var ccdate = new Date(ccdateSplit[1], ccdateSplit[0]-1, 1);
     connection.query('insert into credit_card(type,number,validity) values(?,?,?)', 
-      [user.creditcard_type, user.creditcard_number, moment(new Date(user.creditcard_validity)).format("YYYY-MM-DD HH:mm:ss")], function(err, result) {
+      [user.creditcard_type, user.creditcard_number, moment(ccdate).format("YYYY-MM-DD HH:mm:ss")], function(err, result) {
         if (err) {
          connection.rollback(function() {
           cb(err,null);
@@ -1201,7 +1203,7 @@ exports.buyTickets = function (user, from, to, date, time, cb){
           var code = uuid.v4();
           var obj = code + " " + route_1 + " " + user + " " + datetime;
           var signature = key.sign(obj);
-          
+
           connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature.toString('base64')], function (err1, result1) {
             if (!err1){
                 cb(null, {message: "Successfully inserted ticket " + result1.insertId });
