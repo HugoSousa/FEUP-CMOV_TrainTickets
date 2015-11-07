@@ -1202,9 +1202,9 @@ exports.buyTickets = function (user, from, to, date, time, cb){
           var route_1 = data['route_1'];
           var code = uuid.v4();
           var obj = code + " " + route_1 + " " + user + " " + datetime;
-          var signature = key.sign(obj);
+          var signature = key.sign(obj, 'base64');
 
-          connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature.toString('base64')], function (err1, result1) {
+          connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature], function (err1, result1) {
             if (!err1){
                 cb(null, {message: "Successfully inserted ticket " + result1.insertId });
             }
@@ -1225,9 +1225,9 @@ exports.buyTickets = function (user, from, to, date, time, cb){
 
             var code = uuid.v4();
             var obj = code + " " + route_1 + " " + user + " " + datetime;
-            var signature = key.sign(obj);
+            var signature = key.sign(obj, 'base64');
 
-            connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature.toString('base64')], function(err1, result1){
+            connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_1, user, datetime, code, signature], function(err1, result1){
               if(err1){
                 connection.rollback(function() {
                   cb(err1, null);
@@ -1238,8 +1238,8 @@ exports.buyTickets = function (user, from, to, date, time, cb){
                 var code = uuid.v4();
 
                 var obj = code + " " + route_2 + " " + user + " " + datetime2;
-                var signature = key.sign(obj);
-                connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_2, user, datetime2, code, signature.toString('base64')],function(err2, result2){
+                var signature = key.sign(obj, 'base64');
+                connection.query('insert into ticket(route_id, user_id, is_validated, route_date, uuid, signature) values (?, ?, 0, ?, ?, ?)', [route_2, user, datetime2, code, signature],function(err2, result2){
                   if(err2){
                     connection.rollback(function() {
                       cb(err2, null);

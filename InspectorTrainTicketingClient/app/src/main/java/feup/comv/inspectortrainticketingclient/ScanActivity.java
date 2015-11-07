@@ -42,7 +42,7 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
         routeString = (String)extras.get("route");
         Route route = Route.convertKeyToTicket(routeString);
 
-        String result_string = "{\"data\":{\"code\":\"01f36a83-4519-46f6-920a-907ef2fbb3b3\"},\"signature\":\"WoJzY+lbVmtleO0LJrme0PpZUWwJVjBZd9lySddj4KXyo+Ugb6LGUpjIyk6gtQ==\"}";
+        String result_string = "{\"data\":{\"code\":\"d5554dd3-892a-4bc3-824e-aea250eb53c6\"},\"signature\":\"Wx/s30Ejtsq7lq+KVirGYIvvk3F2yDuKURILeFJ93PBb+VQ4iFSlX6sLNzhmmQ==\"}";
         validateResult(result_string);
 
     }
@@ -108,8 +108,17 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
                     Log.d("cenas",signature);
                     //TODO check with mask/signature
 
-                    PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.decode(public_string.getBytes(), Base64.DEFAULT)));
+                    //remove comment lines from public_key
+                    String[] publicKeySplit = public_string.split("\n");
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < publicKeySplit.length - 1; i++) {
+                        if(! publicKeySplit[i].startsWith("-----"))
+                            sb.append(publicKeySplit[i]);
+                    }
+                    String publicKeyString = sb.toString();
 
+                    //PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyString.getBytes(), Base64.DEFAULT)));
+                    PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.decode(publicKeyString.getBytes("utf-8"), Base64.DEFAULT)));
                     //http://stackoverflow.com/questions/11532989/android-decrypt-rsa-text-using-a-public-key-stored-in-a-file
                     
                     Signature sg = Signature.getInstance("SHA1WithRSA");          // for signing with the stated algorithm
@@ -126,15 +135,10 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
 
         } catch (JSONException e) {
             Log.d("cenas","erro",e);
-        } catch (ParseException e) {
-            Log.d("cenas", "erro", e);
-        } catch (NoSuchAlgorithmException e) {
-            Log.d("cenas", "erro", e);
-        } catch (InvalidKeySpecException e) {
-            Log.d("cenas", "erro", e);
-        }  catch (InvalidKeyException e) {
-            Log.d("cenas", "erro", e);
-        } catch (SignatureException e) {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }catch(Exception e){
+            //bad base 64 encoding for example
             Log.d("cenas", "erro", e);
         }
 
