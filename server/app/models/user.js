@@ -2,6 +2,7 @@
 var database = require('../modules/database.js');
 var moment = require('moment');
 var jwt = require('jwt-simple');
+var fs = require('fs');
 
 var User = function (data) {  
     this.data = data;
@@ -106,7 +107,8 @@ User.loginemployee = function (email, password, res, app) {
             res.json({
                 token  : token,
                 expires: expires,
-                user   : user
+                user   : user,
+                pub    : fs.readFileSync('./data/public.pub').toString()
             });
         })
 };

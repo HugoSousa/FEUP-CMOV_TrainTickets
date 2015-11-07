@@ -80,11 +80,15 @@ public class LoginActivity extends AppCompatActivity implements OnApiRequestComp
 
                     try {
                         String token = result.getString("token");
+                        String pub = result.getString("pub");
+
                         JSONObject user = result.getJSONObject("user");
                         String email = user.getString("email");
 
                         editor.putString("token", token);
                         editor.putString("email", email);
+                        editor.putString("pub", pub);
+
                         editor.commit();
 
                     } catch (JSONException e) {

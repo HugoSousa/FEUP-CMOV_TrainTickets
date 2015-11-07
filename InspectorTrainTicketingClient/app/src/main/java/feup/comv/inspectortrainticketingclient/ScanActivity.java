@@ -8,10 +8,20 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import android.util.Base64;
 
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
@@ -32,7 +42,7 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
         routeString = (String)extras.get("route");
         Route route = Route.convertKeyToTicket(routeString);
 
-        String result_string = "{\"data\":{\"date\":\"2015-11-04 09:00:00\",\"user\":\"1\",\"route\":\"15\",\"code\":\"58b0d531-e344-41bf-9554-6306f9a75405\"},\"signature\":\"ZtrDlNUGprZnW2IHafZFUS6C3IP07A4MEE\\/Dzn7ssFCkfj\"}";
+        String result_string = "{\"data\":{\"code\":\"01f36a83-4519-46f6-920a-907ef2fbb3b3\"},\"signature\":\"WoJzY+lbVmtleO0LJrme0PpZUWwJVjBZd9lySddj4KXyo+Ugb6LGUpjIyk6gtQ==\"}";
         validateResult(result_string);
 
     }
@@ -53,7 +63,6 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
 
     @Override
     public void handleResult(me.dm7.barcodescanner.zbar.Result result) {
-        Log.d("cenas", result.getContents());
         validateResult(result.getContents());
 
     }
@@ -68,17 +77,22 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
             String code = dataObj.getString("code");
             String signature = ticketObj.getString("signature");
 
-
+            SharedPreferences sp2 = getSharedPreferences("login", 0);
             SharedPreferences sp = getSharedPreferences("routes", 0);
+            String public_string = sp2.getString("pub", null);
+            Log.d("cenas", "Public key:");
+            Log.d("cenas", public_string);
+
             HashSet<String> tickets = (HashSet<String>) sp.getStringSet(routeString, null);
             Boolean found = false;
             for (String ticket: tickets) {
+
                 JSONObject tObj = new JSONObject(ticket);
                 String ticketCode =  tObj.getString("uuid");
                 if (ticketCode.equals(code)) {
                     Log.d("cenas", "Local match:");
                     Log.d("cenas", ticket);
-                    String tSig = tObj.getString("signature");
+                    //String tSig = tObj.getString("signature");
                     String tRouteId = tObj.getString("route_id");
                     String userId = tObj.getString("user_id");
                     String dateString = tObj.getString("route_date");
@@ -93,16 +107,37 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
                     Log.d("cenas",mask);
                     Log.d("cenas",signature);
                     //TODO check with mask/signature
+
+                    PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(Base64.decode(public_string.getBytes(), Base64.DEFAULT)));
+
+                    //http://stackoverflow.com/questions/11532989/android-decrypt-rsa-text-using-a-public-key-stored-in-a-file
+                    
+                    Signature sg = Signature.getInstance("SHA1WithRSA");          // for signing with the stated algorithm
+
+
+                    sg.initVerify(publicKey);
+                    sg.update(mask.getBytes());
+                    boolean r = sg.verify(Base64.decode(signature.getBytes(), Base64.DEFAULT));
+                    Log.d("cenas", "Resultado "+ r);
                     found = true;
                     break;
                 }
             }
 
         } catch (JSONException e) {
-            Log.d("cenas",e.toString());
+            Log.d("cenas","erro",e);
         } catch (ParseException e) {
-            Log.d("cenas",e.toString());
+            Log.d("cenas", "erro", e);
+        } catch (NoSuchAlgorithmException e) {
+            Log.d("cenas", "erro", e);
+        } catch (InvalidKeySpecException e) {
+            Log.d("cenas", "erro", e);
+        }  catch (InvalidKeyException e) {
+            Log.d("cenas", "erro", e);
+        } catch (SignatureException e) {
+            Log.d("cenas", "erro", e);
         }
 
     }
 }
+
