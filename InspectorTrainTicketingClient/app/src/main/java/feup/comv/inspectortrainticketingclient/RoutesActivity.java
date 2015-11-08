@@ -57,7 +57,8 @@ public class RoutesActivity extends AppCompatActivity {
             Route t = Route.convertKeyToTicket(entry.getKey());
             //System.out.println("oi");
             System.out.println(t.getKey());
-            routes.add(t);
+            if(entry.getValue() != null)
+                routes.add(t);
         }
 
         ListView routesListView = (ListView)findViewById(R.id.list_view_routes);
@@ -75,7 +76,6 @@ public class RoutesActivity extends AppCompatActivity {
                 Intent routeActivity = new Intent(RoutesActivity.this, RouteActivity.class);
                 routeActivity.putExtra("route_key", routeKey);
                 startActivity(routeActivity);
-
             }
         });
 

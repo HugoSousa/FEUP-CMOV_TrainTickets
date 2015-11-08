@@ -271,12 +271,16 @@ router.route('/statistics/upload')
 		var fraudulent_tickets = req.body.fraudulent_tickets;
 		var no_shows = req.body.no_shows;
 
+		console.log(uploaded_routes);
+		console.log(uploaded_tickets);
+		console.log(validated_tickets);
+		console.log(fraudulent_tickets == "");
+		console.log(no_shows);
+
 		
-		if (uploaded_routes == undefined || !uploaded_routes  || uploaded_routes == "" ||
-			uploaded_tickets == undefined || !uploaded_tickets  || uploaded_tickets == "" ||
-			validated_tickets == undefined || !validated_tickets  || validated_tickets == "" ||
-			fraudulent_tickets == undefined || !fraudulent_tickets  || fraudulent_tickets == "" ||
-			no_shows == undefined || !no_shows  || no_shows == "") res.status(400).json({error: 'Missing request parameters'});
+		if (uploaded_routes == undefined ||	uploaded_tickets == undefined || validated_tickets == undefined || fraudulent_tickets == undefined || no_shows == undefined) {
+				res.status(400).json({error: 'Missing request parameters'});
+		}
 		else{
 			database.updateStatistics(employee, req.body, function(err, data){
 				if(err){
@@ -316,8 +320,8 @@ router.route('/tickets/upload')
 	.post([employeeauth], function(req, res){
 		//var employee_id = req.user.id;
 		var tickets = req.body.tickets;
-
-		console.log(employee_id);
+		console.log(JSON.stringify(tickets));
+		//console.log(employee_id);
 		//for each ticket, if validated = 1, update DB
 		database.uploadTickets(tickets, function(err, data){
 			if(err){

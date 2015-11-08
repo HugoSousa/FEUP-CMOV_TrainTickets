@@ -147,6 +147,7 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
                 editor.commit();
 
                 Intent routesActivity = new Intent(this, RoutesActivity.class);
+                routesActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(routesActivity);
                 finish();
             }

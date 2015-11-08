@@ -1,16 +1,19 @@
 package feup.comv.inspectortrainticketingclient;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -99,28 +102,34 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0) {
-
+        if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
-                String contents = data.getStringExtra("SCAN_RESULT");
-            }
-            if(resultCode == RESULT_CANCELED){
-                //handle cancel
+                ImageView iv = (ImageView)findViewById(R.id.ticket_validation_view);
+                iv.setColorFilter(Color.parseColor("#4caf50"));
+                iv.setImageResource(R.drawable.ic_navigation_check);
+                int validated = Integer.parseInt(((TextView) findViewById(R.id.text_validated_tickets)).getText().toString());
+                validated++;
+                ((TextView)findViewById(R.id.text_validated_tickets)).setText(Integer.toString(validated));
+
+            }else if(resultCode == RESULT_CANCELED){
+                ImageView iv = (ImageView)findViewById(R.id.ticket_validation_view);
+                iv.setColorFilter(Color.parseColor("#f32313"));
+                iv.setImageResource(R.drawable.ic_navigation_close);
+                ((TextView)findViewById(R.id.validation_error_tv)).setText(data.getStringExtra("reason"));
             }
         }
     }
 
     public void scanRoute(View view){
-        //pass the route data to the activity (need route_id...?)
-
         Intent scanActivity = new Intent(this, ScanActivity.class);
         scanActivity.putExtra("route", route.getKey());
-        startActivity(scanActivity);
+        startActivityForResult(scanActivity, 1);
 
     }
 
     public void uploadTrip(View view){
 
+        int uploadedTickets = 0;
         SharedPreferences spToken = getSharedPreferences("login", 0);
         String token = spToken.getString("token", null);
 
@@ -137,6 +146,7 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
             }
         }
 
+        uploadedTickets = tickets.size();
 
         JSONObject bodyObj = new JSONObject();
         JSONArray ticketsObj = new JSONArray();
@@ -144,13 +154,18 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
             try {
                 JSONObject  ticketObj = new JSONObject(ticket);
 
+                //only need to send the ticket uuid and is_validated
+                ticketObj.remove("end_station");
+                ticketObj.remove("route_date");
+                ticketObj.remove("start_station");
+                ticketObj.remove("route_id");
+                ticketObj.remove("user_id");
                 ticketObj.remove("id");
                 ticketObj.remove("switch_central");
                 ticketObj.remove("distance");
                 ticketObj.remove("price");
                 ticketObj.remove("route_1");
                 ticketObj.remove("route_2");
-                ticketObj.remove("uuid");
                 ticketObj.remove("signature");
 
                 ticketsObj.put(ticketObj);
@@ -169,16 +184,12 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
         request.execute("tickets/upload", bodyObj.toString());
 
 
-        //TODO upload statistics too
-        //calculate noShows and totalTickets here...? (not from shared prefs)
         //update statistics and send to server. Set them to 0 on request completed
-        /*
-        SharedPreferences sp = getSharedPreferences("statistics", 0);
+        SharedPreferences spStatistics = getSharedPreferences("statistics", 0);
 
-        int uploadedTickets = sp.getInt("uploaded_tickets", 0);
-        int validatedTickets = sp.getInt("validated_tickets", 0);
-        int fraudulentTickets = sp.getInt("fraudulent_tickets", 0);
-        int noShows = sp.getInt("no_shows", 0);
+        int validatedTickets = spStatistics.getInt("validated_tickets", 0);
+        int fraudulentTickets = spStatistics.getInt("fraudulent_tickets", 0);
+        int noShows = uploadedTickets - validatedTickets;
 
         JSONObject statisticsObj = new JSONObject();
         try {
@@ -193,9 +204,7 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
 
         ApiRequest requestStatistics = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.UPDATE_STATISTICS, token);
         requestStatistics.execute("statistics/upload", statisticsObj.toString());
-        */
 
-        System.out.println(ticketsObj);
     }
 
     private boolean isNetworkConnected() {
@@ -214,13 +223,24 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
                     SharedPreferences sp = getSharedPreferences("statistics", 0);
                     SharedPreferences.Editor editor = sp.edit();
 
-                    editor.putInt("uploaded_tickets", 0);
                     editor.putInt("validated_tickets", 0);
                     editor.putInt("fraudulent_tickets", 0);
-                    editor.putInt("no_shows", 0);
+                    editor.commit();
+
+                    //remove uploaded route from sharedpreferences
+                    removeRoute(route.getKey());
+
+                    finish();
                 }
             }
 
         }
+    }
+
+    private void removeRoute(String routeKey){
+        SharedPreferences sp = getSharedPreferences("routes", 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putStringSet(routeKey, null);
+        editor.commit();
     }
 }

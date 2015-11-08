@@ -1276,10 +1276,10 @@ exports.buyTickets = function (user, from, to, date, time, cb){
 exports.uploadTickets = function(tickets, cb){
 
   async.each(tickets, function(ticket, callback){
-      
+      console.log("TICKET VALIDATED: " + ticket['is_validated'][0]);
       if(ticket['is_validated'][0] == 1){
-          console.log("update ticket");
-          connection.query('update ticket set is_validated = (1) where route_id = ? and user_id = ? and route_date = ?', [ticket['route_id'], ticket['user_id'], ticket['route_date']], function (err, rows, fields) {
+          console.log("update ticket " + ticket['uuid']);
+          connection.query('update ticket set is_validated = (1) where uuid = ?', [ticket['uuid']], function (err, rows, fields) {
             if (!err){
                 callback();
               }
