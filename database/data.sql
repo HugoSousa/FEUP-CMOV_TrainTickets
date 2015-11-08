@@ -21,7 +21,7 @@
 
 LOCK TABLES `credit_card` WRITE;
 /*!40000 ALTER TABLE `credit_card` DISABLE KEYS */;
-INSERT INTO `credit_card` VALUES (1,'VISA','4493829384712361','2017-02-01');
+INSERT INTO `credit_card` VALUES (1,'VISA','4493829384712361','2017-02-01'),(38,'VISA','2414125125152514','2016-10-01');
 /*!40000 ALTER TABLE `credit_card` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -31,7 +31,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
-INSERT INTO `employee` VALUES (1,'hugo@gmail.com','hugo',0,0,0,0,0);
+INSERT INTO `employee` VALUES (1,'hugo@gmail.com','hugo',14,28,8,0,20);
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -71,7 +71,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `ticket` WRITE;
 /*!40000 ALTER TABLE `ticket` DISABLE KEYS */;
-INSERT INTO `ticket` VALUES (24,15,1,'\0','2015-11-05 09:00:00','01f36a83-4519-46f6-920a-907ef2fbb3b3','WoJzY+lbVmtleO0LJrme0PpZUWwJVjBZd9lySddj4KXyo+Ugb6LGUpjIyk6gtQ=='),(25,15,1,'\0','2015-11-05 18:30:00','f0fb5bd0-757f-406c-8c78-ce2cc6dbbe87','WVxnT/j+EfmLWku1Zfg6SzBEsiAPNU5hDklaA6y0xyBFjo466OqFUFLERis8lA=='),(26,15,1,'\0','2015-11-05 09:00:00','756ce40c-a85b-415c-bc70-12d1f5e6a112','TtDEl/YJiwm1ToKJpkZmGVP2taTJU2z4SqW+AYWbvUYmfx0fbEdD/WANdy/3dw==');
+INSERT INTO `ticket` VALUES (32,15,1,'\0','2015-11-08 09:00:00','7374341f-6982-46ba-814e-a9c1b9e6b86c','Z6M0oamtdJ4IC10GgNWyewS0EgKEDHWi6royBLodWMoGLkSJZwBoAKdDR6DONg==');
 /*!40000 ALTER TABLE `ticket` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -91,7 +91,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Hugo Sousa','hugo','hugo',1),(2,'Frm','galseth','12345',1);
+INSERT INTO `user` VALUES (1,'Hugo Sousa','hugo','hugo',1),(2,'Frm','galseth','12345',1),(7,'Hugo Miguel','hugo1','hugo1',38);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -104,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-11-05 10:40:25
+-- Dump completed on 2015-11-08 16:50:50
