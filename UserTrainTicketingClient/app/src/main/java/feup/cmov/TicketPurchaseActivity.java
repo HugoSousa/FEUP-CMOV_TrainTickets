@@ -252,7 +252,9 @@ public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRe
             }else{
                 try {
                     String error = result.getString("error");
-                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(this, error, Toast.LENGTH_LONG);
+                    ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+                    toast.show();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

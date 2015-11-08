@@ -92,7 +92,7 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
     }
 
     public void downloadSpecificTrip(View view){
-        ((Button) view).setEnabled(false);
+        view.setEnabled(false);
         //--
         date = ((TextView)findViewById(R.id.edit_text_date)).getText().toString();
         RadioGroup groupTimes = (RadioGroup) findViewById(R.id.radio_group_times);
@@ -152,5 +152,27 @@ public class PickTimeActivity extends AppCompatActivity implements OnApiRequestC
                 finish();
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        RadioGroup rg = (RadioGroup)findViewById(R.id.radio_group_times);
+        int selectedId = rg.getCheckedRadioButtonId();
+        View radioButton = rg.findViewById(selectedId);
+        int selectedIndex = rg.indexOfChild(radioButton);
+
+        savedInstanceState.putInt("selected_index", selectedIndex);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        int selectedIndex = savedInstanceState.getInt("selected_index");
+
+        RadioGroup rg = (RadioGroup)findViewById(R.id.radio_group_times);
+        ((RadioButton)rg.getChildAt(selectedIndex)).setChecked(true);
     }
 }

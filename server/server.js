@@ -309,7 +309,10 @@ router.route('/tickets/purchase')
 		database.buyTickets(user_id, from, to, date, time, function(err, data){
 			if(err){
 				res.status(400);
-				res.json({error: err});
+				if(err.code == 'ER_DUP_ENTRY')
+					res.json({error: "You already have bought a ticket for this route."});
+				else
+					res.json({error: err});
 			}else{
 				res.json(data);
 			}
@@ -320,7 +323,6 @@ router.route('/tickets/upload')
 	.post([employeeauth], function(req, res){
 		//var employee_id = req.user.id;
 		var tickets = req.body.tickets;
-		console.log(JSON.stringify(tickets));
 		//console.log(employee_id);
 		//for each ticket, if validated = 1, update DB
 		database.uploadTickets(tickets, function(err, data){

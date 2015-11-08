@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -128,6 +129,8 @@ public class RoutesActivity extends AppCompatActivity {
 
         if(id == R.id.action_statistics)
             showStatistics();
+        else if(id == R.id.action_logout)
+            logout();
 
         return super.onOptionsItemSelected(item);
     }
@@ -146,5 +149,17 @@ public class RoutesActivity extends AppCompatActivity {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
+
+    private void logout(){
+        SharedPreferences sp = getSharedPreferences("login", 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("token", null);
+        editor.putString("email", null);
+        editor.putString("pub", null);
+        editor.commit();
+
+        Intent loginActivity = new Intent(this, LoginActivity.class);
+        startActivity(loginActivity);
     }
 }
