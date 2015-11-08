@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Inspector App</string>
+    <string name="app_name">Train Inspector</string>
     <string name="action_statistics">Statistics</string>
     <string name="action_logout">Logout</string>
     <string name="title_activity_login">Inspector login</string>

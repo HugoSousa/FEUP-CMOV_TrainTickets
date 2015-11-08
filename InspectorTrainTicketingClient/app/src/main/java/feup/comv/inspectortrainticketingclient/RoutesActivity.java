@@ -160,6 +160,8 @@ public class RoutesActivity extends AppCompatActivity {
         editor.commit();
 
         Intent loginActivity = new Intent(this, LoginActivity.class);
+        loginActivity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(loginActivity);
+        finish();
     }
 }
