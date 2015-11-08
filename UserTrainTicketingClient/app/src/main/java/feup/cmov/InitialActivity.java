@@ -80,7 +80,7 @@ public class InitialActivity extends AppCompatActivity implements OnApiRequestCo
                 startActivity(intent);
                 finish();
             } else {
-                Toast toast = Toast.makeText(this, "Server is down. Please try again later.", Toast.LENGTH_LONG)
+                Toast toast = Toast.makeText(this, "Server is down. Please try again later.", Toast.LENGTH_LONG);
                 ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
                 toast.show();
             }

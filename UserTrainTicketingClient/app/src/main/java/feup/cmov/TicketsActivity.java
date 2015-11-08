@@ -206,7 +206,8 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
             SharedPreferences.Editor editor = sp.edit();
 
             if(ticketExistsLocally(t.code)){
-                editor.putString(t.code, null);
+                //editor.putString(t.code, null);
+                editor.remove(t.code);
                 editor.commit();
 
                 //symbol.setImageResource(R.drawable.ic_add_black_24dp);
@@ -233,7 +234,7 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                     if(ticketDate.before(today)){
                         //remove from local storage
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putString(entry.getKey(), null);
+                        editor.remove(entry.getKey());
                         editor.commit();
                     }else {
                         tickets.add(t);
