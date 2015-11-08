@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -32,6 +33,9 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route);
+
+        ApiRequest request = new ApiRequest(ApiRequest.GET, this, ApiRequest.requestCode.STATIONS, null);
+        request.execute("stations");
 
         Bundle extras = getIntent().getExtras();
         String routeKey = (String)extras.get("route_key");
@@ -111,11 +115,17 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
                 validated++;
                 ((TextView)findViewById(R.id.text_validated_tickets)).setText(Integer.toString(validated));
 
+                //check from where to where it is valid
+                int from = data.getIntExtra("from", -1);
+                int to = data.getIntExtra("to", -1);
+
+                ((TextView)findViewById(R.id.validation_info_tv)).setText("Valid from " + getStationName(Integer.toString(from)) + " to " + getStationName(Integer.toString(to)));
+
             }else if(resultCode == RESULT_CANCELED){
                 ImageView iv = (ImageView)findViewById(R.id.ticket_validation_view);
                 iv.setColorFilter(Color.parseColor("#f32313"));
                 iv.setImageResource(R.drawable.ic_navigation_close);
-                ((TextView)findViewById(R.id.validation_error_tv)).setText(data.getStringExtra("reason"));
+                ((TextView)findViewById(R.id.validation_info_tv)).setText(data.getStringExtra("reason"));
             }
         }
     }
@@ -232,6 +242,22 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
 
                     finish();
                 }
+            }else if(requestCode == ApiRequest.requestCode.STATIONS){
+                try {
+                    JSONArray stations = (JSONArray)result.get("stations");
+
+                    SharedPreferences sp = this.getSharedPreferences("stations", 0);
+                    SharedPreferences.Editor editor = sp.edit();
+
+                    for(int i = 0; i < stations.length(); i++){
+                        JSONObject station = (JSONObject)stations.get(i);
+                        editor.putString(station.get("id").toString(), (String) station.get("name"));
+                    }
+
+                    editor.commit();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
@@ -242,5 +268,12 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
         SharedPreferences.Editor editor = sp.edit();
         editor.putStringSet(routeKey, null);
         editor.commit();
+    }
+
+    private String getStationName(String id){
+
+        SharedPreferences sp = this.getSharedPreferences("stations", 0);
+
+        return sp.getString(id, null);
     }
 }

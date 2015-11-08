@@ -34,7 +34,8 @@ public class ApiRequest extends AsyncTask<String, Void, JSONObject> {
         DOWNLOAD_TICKET,
         UPLOAD,
         UPDATE_STATISTICS,
-        STATISTICS
+        STATISTICS,
+        STATIONS
     }
     private requestCode requestCode;
     private String token;

@@ -1,6 +1,5 @@
 package feup.cmov;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +26,9 @@ public class InitialActivity extends AppCompatActivity implements OnApiRequestCo
         if(isNetworkConnected()) {
             redirectIfServerUp();
         }else{
-            Toast.makeText(this, "You have no internet connection. You're now in offline mode.", Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(this, "You have no internet connection. You're now in offline mode.", Toast.LENGTH_LONG);
+            ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+            toast.show();
 
             registerReceiver(new BroadcastReceiver() {
                 public void onReceive(Context context, Intent intent) {
@@ -78,7 +80,9 @@ public class InitialActivity extends AppCompatActivity implements OnApiRequestCo
                 startActivity(intent);
                 finish();
             } else {
-                Toast.makeText(this, "Server is down. Please try again later.", Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(this, "Server is down. Please try again later.", Toast.LENGTH_LONG)
+                ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+                toast.show();
             }
         }
     }

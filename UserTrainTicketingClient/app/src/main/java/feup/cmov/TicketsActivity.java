@@ -24,9 +24,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
@@ -40,6 +42,8 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tickets);
+
+        removePastLocalTickets();
 
         if(! isNetworkConnected()) {
             Toast toast = Toast.makeText(this, "You have no internet connection. Only tickets from local storage are available now. Reconnect to internet to check all your tickets.", Toast.LENGTH_LONG);
@@ -118,19 +122,6 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        /*
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        tickets.add(new Ticket("a", "b", 1, "c", "d", "e", 2, 3));
-        */
 
         setTickets(tickets);
     }
@@ -221,6 +212,38 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
                 //symbol.setImageResource(R.drawable.ic_add_black_24dp);
             }
             adapter.notifyDataSetChanged();
+        }
+    }
+
+    private void removePastLocalTickets(){
+        SharedPreferences sp = this.getSharedPreferences("tickets", 0);
+        Map<String, ?> allEntries = sp.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            String ticketString = sp.getString(entry.getKey(), null);
+            try {
+                if(ticketString != null) {
+                    JSONObject ticketObj = new JSONObject(ticketString);
+                    Ticket t = Ticket.JSONtoTicket(ticketObj, entry.getKey());
+
+                    String ticketDateString = t.date.split(" ")[0];
+                    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                    Date ticketDate = df.parse(ticketDateString);
+                    Date today = Calendar.getInstance().getTime();
+
+                    if(ticketDate.before(today)){
+                        //remove from local storage
+                        SharedPreferences.Editor editor = sp.edit();
+                        editor.putString(entry.getKey(), null);
+                        editor.commit();
+                    }else {
+                        tickets.add(t);
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -385,4 +408,5 @@ public class TicketsActivity extends AppCompatActivity implements OnApiRequestCo
 
         registerReceiver(br, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
+
 }

@@ -215,7 +215,9 @@ public class TicketPurchaseActivity extends AppCompatActivity implements OnApiRe
         if(token == null){
             Intent loginIntent = new Intent(this, LoginActivity.class);
             startActivity(loginIntent);
-            Toast.makeText(this, "You need to be logged in to buy tickets.", Toast.LENGTH_LONG).show();
+            Toast toast = Toast.makeText(this, "You need to be logged in to buy tickets.", Toast.LENGTH_LONG);
+            ((TextView)toast.getView().findViewById(android.R.id.message)).setGravity(Gravity.CENTER);
+            toast.show();
         }else {
             ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.BUY_TICKET, token);
 

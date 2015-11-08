@@ -38,7 +38,7 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan);
+        //setContentView(R.layout.activity_scan);
 
         scannerView = new ZBarScannerView(this);   // Programmatically initialize the scanner view
         setContentView(scannerView);              // Set the scanner view as the content view
@@ -47,7 +47,7 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
         routeString = (String)extras.get("route");
         Route route = Route.convertKeyToTicket(routeString);
 
-        String result_string = "{\"data\":{\"code\":\"d5554dd3-892a-4bc3-824e-aea250eb53c6\"},\"signature\":\"Wx/s30Ejtsq7lq+KVirGYIvvk3F2yDuKURILeFJ93PBb+VQ4iFSlX6sLNzhmmQ==\"}";
+        String result_string = "{\"data\":{\"code\":\"7374341f-6982-46ba-814e-a9c1b9e6b86c\"},\"signature\":\"Z6M0oamtdJ4IC10GgNWyewS0EgKEDHWi6royBLodWMoGLkSJZwBoAKdDR6DONg==\"}";
         validateResult(result_string);
     }
 
@@ -144,7 +144,7 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
             if(found){
                 if(validated) {
                     if(! isValidated(routeString, ticketCode)) {
-                        setTicketValidated(routeString, ticketCode);
+                        setTicketValidated(routeString, ticketCode, intent);
                         setResult(Activity.RESULT_OK, intent);
                     }else{
                         intent.putExtra("reason", "Ticket already validated.");
@@ -171,7 +171,7 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
         finish();
     }
 
-    private void setTicketValidated(String routeKey, String ticketCode){
+    private void setTicketValidated(String routeKey, String ticketCode, Intent intent){
 
         JSONArray validatedArray = new JSONArray();
         validatedArray.put(1);
@@ -195,6 +195,8 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
                 String code = ticketObj.getString("uuid");
                 if(ticketCode.equals(code)){
                     found = true;
+                    intent.putExtra("from", ticketObj.getInt("start_station"));
+                    intent.putExtra("to", ticketObj.getInt("end_station"));
                     //replace this ticket in the hashset
                     tickets.remove(ticket);
                     ticketObj.put("is_validated", validatedArray);

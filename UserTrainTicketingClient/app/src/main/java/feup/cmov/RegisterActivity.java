@@ -166,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity implements OnApiRequestC
                 passwordConfirmTV.setText("");
                 passwordTV.setError("Password and Confirmation don't match.");
             }else if(ccNumber.length() < 15 || ccNumber.length() > 19){
-                ccNumberTV.setText("Invalid credit card number. Should have between 15 and 19 digits.");
+                ccNumberTV.setError("Invalid credit card number. Should have between 15 and 19 digits.");
             }else{
                 ApiRequest request = new ApiRequest(ApiRequest.POST, this, ApiRequest.requestCode.REGISTER, null);
                 JSONObject bodyObj = new JSONObject();
