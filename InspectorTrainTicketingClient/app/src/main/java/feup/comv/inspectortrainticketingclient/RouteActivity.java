@@ -137,8 +137,10 @@ public class RouteActivity extends AppCompatActivity implements OnApiRequestComp
         NdefMessage msg = (NdefMessage) rawMsgs[0];
         if (route != null) {
             Log.d("cenas2",route.getKey());
+            validateResult( new String(msg.getRecords()[0].getPayload()));
         }
         Log.d("cenas2", new String(msg.getRecords()[0].getPayload()));
+
     }
 
     public void validateResult(String result) {
