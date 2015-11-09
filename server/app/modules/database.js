@@ -718,7 +718,7 @@ exports.getUnusedTickets = function (user, cb) {
 
   var today = moment().format('YYYY-MM-DD'); 
 
-  connection.query('select * from ticket t join route r on t.route_id = r.id where user_id = ? and is_validated = (0) and route_date < ?', [user, today], function (err, rows, fields) {
+  connection.query('select * from ticket t join route r on t.route_id = r.id where user_id = ? and is_validated = (0) and route_date >= ?', [user, today], function (err, rows, fields) {
     if (!err){
         cb(null, rows);
       }
