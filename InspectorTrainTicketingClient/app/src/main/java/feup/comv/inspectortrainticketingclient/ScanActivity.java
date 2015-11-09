@@ -47,8 +47,8 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
         routeString = (String)extras.get("route");
         Route route = Route.convertKeyToTicket(routeString);
 
-        String result_string = "{\"data\":{\"code\":\"7374341f-6982-46ba-814e-a9c1b9e6b86c\"},\"signature\":\"Z6M0oamtdJ4IC10GgNWyewS0EgKEDHWi6royBLodWMoGLkSJZwBoAKdDR6DONg==\"}";
-        validateResult(result_string);
+        //String result_string = "{\"data\":{\"code\":\"7374341f-6982-46ba-814e-a9c1b9e6b86c\"},\"signature\":\"Z6M0oamtdJ4IC10GgNWyewS0EgKEDHWi6royBLodWMoGLkSJZwBoAKdDR6DONg==\"}";
+        //validateResult(result_string);
     }
 
 
@@ -69,6 +69,11 @@ public class ScanActivity extends AppCompatActivity implements ZBarScannerView.R
     public void handleResult(me.dm7.barcodescanner.zbar.Result result) {
         validateResult(result.getContents());
 
+    }
+
+    public void onBackPressed(){
+        setResult(2);
+        finish();
     }
 
     public void validateResult(String result) {
