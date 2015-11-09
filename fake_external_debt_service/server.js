@@ -28,7 +28,7 @@ router.use(function(req, res, next) {
 
 
 router.get('/', function(req, res) {
-	res.json({ result: {message:'Welcome to Train Tickets API!' } });	
+	res.json({ result: {message:'Welcome to Credit card check API!' } });	
 });
 
 // USER ROUTING
@@ -39,8 +39,17 @@ router.route('/validate')
 		//cc_number
 		//cc_type
 		//cc_validity
-		res.json({ result: {message:'Sucess' } });
-	})
+		var n = random(0,10);
+		if (n === 1)
+			res.json( {error:'true'});
+		else
+			res.json( {message:'Sucess'});
+
+	});
+	
+function random (low, high) {
+    return Math.round(Math.random() * (high - low) + low);
+}
 
 
 // REGISTER OUR ROUTES -------------------------------

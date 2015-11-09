@@ -9,6 +9,7 @@ var morgan     = require('morgan');
 var userauth = require('./app/modules/userAuth.js');
 var employeeauth = require('./app/modules/employeeAuth.js');
 var async = require('async');
+var http = require('http');
 
 /*
 var NodeRSA = require('node-rsa');
@@ -299,24 +300,69 @@ router.route('/statistics/upload')
 
 router.route('/tickets/purchase')
 	.post([userauth], function(req, res) {
-		var user_id = req.user.id;
-		var from = req.body.from;
-		var to = req.body.to;
-		var date = req.body.date;
-		var time = req.body.time;
-		
-		//if multiple tickets, do transaction
-		database.buyTickets(user_id, from, to, date, time, function(err, data){
-			if(err){
+		var execute = function() {
+			var user_id = req.user.id;
+			var from = req.body.from;
+			var to = req.body.to;
+			var date = req.body.date;
+			var time = req.body.time;
+			
+			//if multiple tickets, do transaction
+			database.buyTickets(user_id, from, to, date, time, function(err, data){
+				if(err){
+					res.status(400);
+					if(err.code == 'ER_DUP_ENTRY')
+						res.json({error: "You already have bought a ticket for this route."});
+					else
+						res.json({error: err});
+				}else{
+					res.json(data);
+				}
+			});
+		};
+
+		var options = {
+  		  host: 'localhost',
+		  path: '/api/validate',
+		  port: '8081',
+		  method: 'POST'	
+		};
+
+		var callback = function(response) {
+		  var str = '';
+
+		  //another chunk of data has been recieved, so append it to `str`
+		  response.on('data', function (chunk) {
+		    str += chunk;
+		  });
+
+		  //the whole response has been recieved, so we just print it out here
+		  response.on('end', function () {
+		    var validation = JSON.parse(str);
+
+		    if (validation.error) {
 				res.status(400);
-				if(err.code == 'ER_DUP_ENTRY')
-					res.json({error: "You already have bought a ticket for this route."});
-				else
-					res.json({error: err});
-			}else{
-				res.json(data);
-			}
+				res.json({error: "Invalid credit card"});
+		    }
+		    else {
+		    	execute();
+
+		    }
+		  });
+
+	
+		}
+
+		var r = http.request(options, callback);
+		//ignore credit card if the external server is offline
+		r.on('error', function(error) {
+			console.log('error on external server');
+			execute();
 		});
+
+		r.end();
+
+
 })
 
 router.route('/tickets/upload')
