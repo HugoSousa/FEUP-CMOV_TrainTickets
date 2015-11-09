@@ -83,7 +83,12 @@
             android:layout_height="250dp"
             android:id="@+id/ticket_qr_view"/>
 
-    </LinearLayout>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/send_nfc_button"
+            android:onClick="sendNfc"/>
 
+    </LinearLayout>
 </RelativeLayout>
 </ScrollView>

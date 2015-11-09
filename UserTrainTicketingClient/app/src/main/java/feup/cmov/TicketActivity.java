@@ -2,10 +2,16 @@ package feup.cmov;
 
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -13,7 +19,10 @@ import com.google.zxing.WriterException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TicketActivity extends AppCompatActivity {
+import java.nio.charset.Charset;
+
+public class TicketActivity extends AppCompatActivity implements NfcAdapter.OnNdefPushCompleteCallback  {
+    String data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +58,7 @@ public class TicketActivity extends AppCompatActivity {
 
         ImageView imageView = (ImageView) findViewById(R.id.ticket_qr_view);
 
-        String data = obj.toString();
+        data = obj.toString();
         QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(data, null,
                 "TEXT_TYPE", BarcodeFormat.QR_CODE.toString(), data.length());
 
@@ -76,5 +85,40 @@ public class TicketActivity extends AppCompatActivity {
         SharedPreferences sp = this.getSharedPreferences("stations", 0);
 
         return sp.getString(id, null);
+    }
+
+    public void sendNfc(View v) {
+        NfcAdapter mNfcAdapter;
+        String tag = "application/nfc.feup.cmov.tickettype";
+        byte[] message;
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Toast.makeText(getApplicationContext(), "NFC is not available on this device.", Toast.LENGTH_LONG).show();
+            return;
+        } else {
+            message = data.getBytes();
+            NdefMessage msg = new NdefMessage(new NdefRecord[] { createMimeRecord(tag, message) });
+            mNfcAdapter.setNdefPushMessage(msg, this);
+            mNfcAdapter.setOnNdefPushCompleteCallback(this, this);
+            Toast.makeText(getApplicationContext(), "Ticket sending attempted...", Toast.LENGTH_LONG).show();
+
+
+        }
+    }
+
+
+    public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
+        byte[] mimeBytes = mimeType.getBytes(Charset.forName("ISO-8859-1"));
+        return new NdefRecord(
+                NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+    }
+
+    @Override
+    public void onNdefPushComplete(NfcEvent event) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), "Ticket sent.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
